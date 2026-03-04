@@ -1,26 +1,171 @@
+/* ============================================================
+   FARMIZO GLOBAL STYLES & DESIGN TOKENS
+   ------------------------------------------------------------
+   This file defines the entire visual language of the app:
+   - colors
+   - surfaces
+   - actions
+   - text
+   - borders
+   - status feedback
+   - dark mode
+   - Tailwind integration
+
+   👉 Change values here = update the whole site.
+============================================================ */
+
 @import "tailwindcss";
 
+/* ============================================================
+   🌞 LIGHT MODE — DEFAULT THEME
+============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* -----------------------------
+     PAGE & SECTION BACKGROUNDS
+  ------------------------------ */
+  --bg-page: #ffffff;            /* main site background */
+  --bg-section-soft: #ecfdf5;    /* light green section */
+  --bg-section-muted: #f3f4f6;   /* subtle gray section */
+
+  /* -----------------------------
+     PRIMARY USER ACTIONS
+  ------------------------------ */
+  --action-primary: #15803d;         /* main CTA buttons */
+  --action-primary-hover: #166534;   /* hover state */
+  --action-secondary: #059669;       /* secondary highlights */
+
+  /* -----------------------------
+     TEXT COLORS
+  ------------------------------ */
+  --text-heading: #111827;     /* titles & headings */
+  --text-body: #374151;        /* normal paragraph text */
+  --text-muted: #6b7280;       /* captions & hints */
+  --text-inverse: #ffffff;     /* text on dark bg */
+
+  /* -----------------------------
+     BORDERS & DIVIDERS
+  ------------------------------ */
+  --border-default: #e5e7eb;   /* cards, inputs */
+  --border-strong: #d1d5db;    /* stronger separation */
+
+  /* -----------------------------
+     STATUS / FEEDBACK COLORS
+  ------------------------------ */
+  --status-success: #16a34a;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  --status-info: #3b82f6;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================================
+   🌙 DARK MODE (AUTO — SYSTEM PREF)
+   We only change variables here.
+   Components remain untouched.
+============================================================ */
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg-page: #0a0f0c;
+    --bg-section-soft: #052e16;
+    --bg-section-muted: #111827;
+
+    --action-primary: #22c55e;
+    --action-primary-hover: #16a34a;
+    --action-secondary: #34d399;
+
+    --text-heading: #ecfdf5;
+    --text-body: #d1fae5;
+    --text-muted: #9ca3af;
+    --text-inverse: #022c22;
+
+    --border-default: #14532d;
+    --border-strong: #166534;
+
+    --status-success: #22c55e;
+    --status-warning: #fbbf24;
+    --status-error: #f87171;
+    --status-info: #60a5fa;
   }
 }
 
+/* ============================================================
+   🎯 TAILWIND TOKEN EXPOSURE
+   These map CSS variables to Tailwind utility classes.
+   Example:
+     bg-action-primary
+     text-text-heading
+     border-border-default
+============================================================ */
+
+@theme inline {
+  /* backgrounds */
+  --color-bg-page: var(--bg-page);
+  --color-bg-section-soft: var(--bg-section-soft);
+  --color-bg-section-muted: var(--bg-section-muted);
+
+  /* actions */
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-secondary: var(--action-secondary);
+
+  /* text */
+  --color-text-heading: var(--text-heading);
+  --color-text-body: var(--text-body);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
+
+  /* borders */
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+
+  /* status */
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-error: var(--status-error);
+  --color-status-info: var(--status-info);
+}
+
+/* ============================================================
+   🧱 BASE ELEMENT STYLES
+============================================================ */
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-body);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ============================================================
+   🔍 ACCESSIBILITY & UX HELPERS
+============================================================ */
+
+/* smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* default focus outline for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--action-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   🧹 RESET IMPROVEMENTS
+============================================================ */
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  cursor: pointer;
 }
