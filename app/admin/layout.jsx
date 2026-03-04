@@ -1,18 +1,41 @@
+"use client";
+
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Link from "next/link";
+
 export default function AdminLayout({ children }) {
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/admin");
+    } else if (user?.role !== "admin") {
+      router.push("/");
+    }
+  }, [isAuthenticated, user, router]);
+
+  if (!isAuthenticated || user?.role !== "admin") {
+    return null;
+  }
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-green-800 text-white p-6">
-        <h2 className="text-2xl font-bold mb-6">Farmizo Admin</h2>
-        <nav className="space-y-3">
-          <a href="/admin/dashboard">Dashboard</a><br />
-          <a href="/admin/products">Products</a><br />
-          <a href="/admin/orders">Orders</a>
+    <div className="flex min-h-screen">
+      <aside className="w-64 bg-gray-900 text-white p-6">
+        <h2 className="text-xl font-bold mb-8">Admin Panel</h2>
+
+        <nav className="space-y-4">
+          <a href="/admin" className="block">Dashboard</a>
+          <a href="/admin/orders" className="block">Orders</a>
+          <Link href = "/admin/products" className = "block"></Link>
+          {/* <a href="/admin/products" className="block">Products</a> */}
+          <a href="/admin/users" className="block">Users</a>
         </nav>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-10 bg-gray-50">
         {children}
       </main>
     </div>
