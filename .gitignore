@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/farmizo-backend/node_modules
+/farmizo-app
 /.pnp
 .pnp.*
 .yarn/*
