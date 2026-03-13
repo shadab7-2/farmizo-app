@@ -1,43 +1,57 @@
-import ProductCard from "@/components/product/ProductCard";
+﻿"use client";
 
-// Phase-1 mock search pool
-const ALL_PRODUCTS = [
-  {
-    name: "Aloe Vera Plant",
-    slug: "aloe-vera-plant",
-    price: 299,
-    image: "/cat-indoor.jpg",
-  },
-  {
-    name: "Neem Oil Spray",
-    slug: "neem-oil-spray",
-    price: 299,
-    image:
-      "https://images.unsplash.com/photo-1598514982845-cc1f1c1bfb4b?q=80&w=1200",
-  },
-  {
-    name: "Garden Tool Set",
-    slug: "garden-tool-set",
-    price: 899,
-    image:
-      "https://images.unsplash.com/photo-1590080876206-1dc0c5c85f63?q=80&w=1200",
-  },
-];
+import { useEffect, useState } from "react";
+import ProductCard from "@/components/product/ProductCard";
+import { searchProducts } from "@/services/product.service";
 
 export default function SearchResults({ query }) {
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const search = async () => {
+      if (!query || !query.trim()) {
+        setResults([]);
+        setError(null);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await searchProducts({ q: query.trim(), page: 1, limit: 24 });
+        setResults(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError(err.message || "Failed to search products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    search();
+  }, [query]);
+
   if (!query) {
     return (
       <p className="text-center text-text-muted">
-        Start typing to search products 🌱
+        Start typing to search products.
       </p>
     );
   }
 
-  const results = ALL_PRODUCTS.filter((product) =>
-    product.name
-      .toLowerCase()
-      .includes(query.toLowerCase())
-  );
+  if (loading) {
+    return (
+      <p className="text-center text-text-muted">Searching products...</p>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="text-center text-red-500">{error}</p>
+    );
+  }
 
   if (results.length === 0) {
     return (
@@ -51,7 +65,7 @@ export default function SearchResults({ query }) {
     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {results.map((product) => (
         <ProductCard
-          key={product.slug}
+          key={product._id || product.slug}
           product={product}
         />
       ))}

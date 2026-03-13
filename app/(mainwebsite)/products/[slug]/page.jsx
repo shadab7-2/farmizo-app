@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "@/components/common/SafeImage";
-import { Minus, Plus, Truck, ShieldCheck, Leaf } from "lucide-react";
+import { Minus, Plus, Truck, ShieldCheck, Leaf, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import api from "@/services/api";
 import ProductCard from "@/components/product/ProductCard";
+import ProductReviews from "@/components/product/ProductReviews";
 import { addToCartOptimistic, addItemToCart } from "@/store/slices/cartSlice";
 import toast from "react-hot-toast";
 
@@ -72,9 +73,11 @@ export default function ProductDetailPage() {
   const images =
     product.images && product.images.length > 0
       ? product.images
-      : ["/placeholder.jpg"]; // put placeholder in public folder
+      : ["/placeholder.jpg"];
 
   const inStock = product.stock > 0;
+  const ratingValue = Number(product.rating || 0);
+  const reviewCount = Number(product.numReviews || 0);
 
   // ================= CART HANDLER =================
   const handleAddToCart = () => {
@@ -82,7 +85,7 @@ export default function ProductDetailPage() {
       toast.error("This item is out of stock");
       return;
     }
-    // 1 Instant Ui updates
+
     dispatch(
       addToCartOptimistic({
         _id: product._id,
@@ -96,7 +99,6 @@ export default function ProductDetailPage() {
       `${qty} item${qty > 1 ? "s" : ""} added to cart successfully`,
     );
 
-    // 2 Sync with backend only for logged-in users
     if (isAuthenticated) {
       dispatch(
         addItemToCart({
@@ -111,11 +113,9 @@ export default function ProductDetailPage() {
     }
   };
 
-  // ================= UI =================
   return (
     <main className="bg-bg-page">
       <section className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-20">
-        {/* ================= IMAGE GALLERY ================= */}
         <div className="space-y-6">
           <div className="relative h-[420px] rounded-2xl overflow-hidden border border-border-default">
             <Image
@@ -127,7 +127,6 @@ export default function ProductDetailPage() {
             />
           </div>
 
-          {/* THUMBNAILS */}
           {images.length > 1 && (
             <div className="grid grid-cols-3 gap-4">
               {images.map((img, idx) => (
@@ -147,7 +146,6 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* ================= INFO ================= */}
         <div>
           <p className="text-sm uppercase tracking-wide text-text-muted">
             {product.category || "Farmizo"}
@@ -157,13 +155,31 @@ export default function ProductDetailPage() {
             {product.name}
           </h1>
 
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((idx) => (
+                <Star
+                  key={idx}
+                  size={16}
+                  className={
+                    idx <= Math.round(ratingValue)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-gray-300"
+                  }
+                />
+              ))}
+            </div>
+            <p className="text-sm text-text-muted">
+              {ratingValue.toFixed(1)} ({reviewCount} reviews)
+            </p>
+          </div>
+
           <p className="mt-4 text-3xl font-bold text-action-primary">
-            ₹{product.price}
+            Rs. {product.price}
           </p>
 
           <p className="mt-6 text-text-body">{product.description}</p>
 
-          {/* STOCK */}
           <p
             className={`mt-4 font-medium ${
               inStock ? "text-status-success" : "text-red-500"
@@ -172,7 +188,6 @@ export default function ProductDetailPage() {
             {inStock ? "In Stock" : "Out of Stock"}
           </p>
 
-          {/* ================= QTY ================= */}
           {inStock && (
             <div className="mt-8 flex items-center gap-4">
               <button
@@ -193,7 +208,6 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {/* ================= CTA ================= */}
           <button
             disabled={!inStock}
             onClick={handleAddToCart}
@@ -207,7 +221,6 @@ export default function ProductDetailPage() {
             {inStock ? "Add to Cart" : "Out of Stock"}
           </button>
 
-          {/* ================= TRUST ================= */}
           <div className="mt-10 grid sm:grid-cols-3 gap-6 text-sm text-text-muted">
             <div className="flex items-center gap-2">
               <Truck size={18} /> Fast delivery
@@ -223,7 +236,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </section>
-      {/* ================= RELATED PRODUCTS ================= */}
+
       {related.length > 0 && (
         <section className="max-w-7xl mx-auto px-6 pb-24">
           <h2 className="text-3xl font-bold text-text-heading mb-10">
@@ -237,6 +250,14 @@ export default function ProductDetailPage() {
           </div>
         </section>
       )}
+
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+        <ProductReviews
+          productId={product._id}
+          initialRating={ratingValue}
+          initialNumReviews={reviewCount}
+        />
+      </section>
     </main>
   );
 }

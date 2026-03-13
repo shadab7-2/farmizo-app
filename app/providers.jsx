@@ -2,9 +2,10 @@
 
 import { Provider, useDispatch } from "react-redux";
 import { store } from "@/store";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, isValidElement } from "react";
 import { loadUser } from "@/store/slices/authSlice";
 import {loadCart} from "@/store/slices/cartSlice";
+import { fetchWishlist } from "@/store/slices/wishlistSlice";
 import { Toaster } from "react-hot-toast";
 
 /* ---------------------------------------------
@@ -28,6 +29,7 @@ function AppInitializer({ children }) {
         // 2️⃣ If logged in → fetch cart
         if (loadUser.fulfilled.match(userResult) && userResult.payload) {
           await dispatch(loadCart());
+          await dispatch(fetchWishlist());
         }
 
       } catch (err) {
@@ -42,10 +44,30 @@ function AppInitializer({ children }) {
 }
 
 export default function Providers({ children }) {
+  // Guard against accidentally rendering raw Error objects (React cannot render plain objects)
+  const safeChildren = useMemo(() => {
+    if (
+      children == null ||
+      typeof children === "string" ||
+      typeof children === "number" ||
+      Array.isArray(children) ||
+      isValidElement(children)
+    ) {
+      return children;
+    }
+
+    if (typeof children === "object" && "message" in children) {
+      console.error("Unexpected non-renderable child passed to <Providers>:", children);
+      return <div className="text-center text-red-600 py-8">Something went wrong: {children.message}</div>;
+    }
+
+    return String(children);
+  }, [children]);
+
   return (
     <Provider store={store}>
       <Toaster position="top-center"/>
-      <AppInitializer>{children}</AppInitializer>
+      <AppInitializer>{safeChildren}</AppInitializer>
     </Provider>
   );
 }

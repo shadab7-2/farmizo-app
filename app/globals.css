@@ -1,133 +1,201 @@
 /* ============================================================
-   FARMIZO GLOBAL STYLES & DESIGN TOKENS
+   FARMIZO GLOBAL DESIGN SYSTEM
    ------------------------------------------------------------
-   This file defines the entire visual language of the app:
-   - colors
-   - surfaces
-   - actions
-   - text
-   - borders
-   - status feedback
-   - dark mode
-   - Tailwind integration
+   Central design tokens controlling the entire UI system.
+   Change values here → update the whole application.
 
-   👉 Change values here = update the whole site.
+   Includes:
+   - Brand colors
+   - Surfaces (cards, sidebar, tables)
+   - Actions
+   - Typography
+   - Borders
+   - Status colors
+   - Dark mode
 ============================================================ */
 
 @import "tailwindcss";
 
 /* ============================================================
-   🌞 LIGHT MODE — DEFAULT THEME
+   🌞 LIGHT MODE — FARMIZO THEME
 ============================================================ */
 
 :root {
-  /* -----------------------------
-     PAGE & SECTION BACKGROUNDS
-  ------------------------------ */
-  --bg-page: #ffffff;            /* main site background */
-  --bg-section-soft: #ecfdf5;    /* light green section */
-  --bg-section-muted: #f3f4f6;   /* subtle gray section */
 
-  /* -----------------------------
-     PRIMARY USER ACTIONS
-  ------------------------------ */
-  --action-primary: #15803d;         /* main CTA buttons */
-  --action-primary-hover: #166534;   /* hover state */
-  --action-secondary: #059669;       /* secondary highlights */
+  /* =========================================================
+     🌿 BRAND COLORS
+  ========================================================= */
 
-  /* -----------------------------
-     TEXT COLORS
-  ------------------------------ */
-  --text-heading: #111827;     /* titles & headings */
-  --text-body: #374151;        /* normal paragraph text */
-  --text-muted: #6b7280;       /* captions & hints */
-  --text-inverse: #ffffff;     /* text on dark bg */
+  --brand-primary: #166534;          /* deep plant green */
+  --brand-primary-hover: #14532d;
 
-  /* -----------------------------
-     BORDERS & DIVIDERS
-  ------------------------------ */
-  --border-default: #e5e7eb;   /* cards, inputs */
-  --border-strong: #d1d5db;    /* stronger separation */
+  --brand-secondary: #22c55e;        /* fresh leaf green */
+  --brand-accent: #84cc16;           /* lime accent */
 
-  /* -----------------------------
-     STATUS / FEEDBACK COLORS
-  ------------------------------ */
+  /* =========================================================
+     PAGE BACKGROUNDS
+  ========================================================= */
+
+  --bg-page: #f8fafc;                /* page background */
+  --bg-section-soft: #f0fdf4;        /* soft green sections */
+  --bg-section-muted: #f1f5f9;
+
+  /* =========================================================
+     SURFACES (UI CONTAINERS)
+  ========================================================= */
+
+  --surface-card: #ffffff;
+  --surface-sidebar: #052e16;
+  --surface-table-header: #ecfdf5;
+  --surface-hover: #f0fdf4;
+
+  /* =========================================================
+     USER ACTIONS
+  ========================================================= */
+
+  --action-primary: #166534;
+  --action-primary-hover: #14532d;
+
+  --action-secondary: #22c55e;
+  --action-secondary-hover: #16a34a;
+
+  /* =========================================================
+     TEXT SYSTEM
+  ========================================================= */
+
+  --text-heading: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  /* =========================================================
+     BORDERS
+  ========================================================= */
+
+  --border-default: #e2e8f0;
+  --border-strong: #cbd5f5;
+
+  /* =========================================================
+     STATUS COLORS
+  ========================================================= */
+
   --status-success: #16a34a;
   --status-warning: #f59e0b;
   --status-error: #ef4444;
   --status-info: #3b82f6;
+
 }
 
 /* ============================================================
-   🌙 DARK MODE (AUTO — SYSTEM PREF)
-   We only change variables here.
-   Components remain untouched.
+   🌙 DARK MODE — FARMIZO NIGHT THEME
 ============================================================ */
 
 @media (prefers-color-scheme: dark) {
+
   :root {
-    --bg-page: #0a0f0c;
-    --bg-section-soft: #052e16;
-    --bg-section-muted: #111827;
+
+    --bg-page: #020617;
+    --bg-section-soft: #022c22;
+    --bg-section-muted: #0f172a;
+
+    --surface-card: #0f172a;
+    --surface-sidebar: #021c12;
+    --surface-table-header: #022c22;
+    --surface-hover: #052e16;
+
+    --brand-primary: #22c55e;
+    --brand-primary-hover: #16a34a;
+
+    --brand-secondary: #34d399;
+    --brand-accent: #a3e635;
 
     --action-primary: #22c55e;
     --action-primary-hover: #16a34a;
+
     --action-secondary: #34d399;
+    --action-secondary-hover: #10b981;
 
     --text-heading: #ecfdf5;
     --text-body: #d1fae5;
-    --text-muted: #9ca3af;
+    --text-muted: #94a3b8;
     --text-inverse: #022c22;
 
-    --border-default: #14532d;
-    --border-strong: #166534;
+    --border-default: #1e293b;
+    --border-strong: #334155;
 
     --status-success: #22c55e;
     --status-warning: #fbbf24;
     --status-error: #f87171;
     --status-info: #60a5fa;
+
   }
+
 }
 
 /* ============================================================
    🎯 TAILWIND TOKEN EXPOSURE
-   These map CSS variables to Tailwind utility classes.
-   Example:
-     bg-action-primary
-     text-text-heading
-     border-border-default
+   This allows usage like:
+
+   bg-brand-primary
+   bg-surface-card
+   text-text-heading
+   border-border-default
 ============================================================ */
 
 @theme inline {
+
+  /* brand */
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+
   /* backgrounds */
+
   --color-bg-page: var(--bg-page);
   --color-bg-section-soft: var(--bg-section-soft);
   --color-bg-section-muted: var(--bg-section-muted);
 
+  /* surfaces */
+
+  --color-surface-card: var(--surface-card);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-surface-table-header: var(--surface-table-header);
+  --color-surface-hover: var(--surface-hover);
+
   /* actions */
+
   --color-action-primary: var(--action-primary);
   --color-action-primary-hover: var(--action-primary-hover);
+
   --color-action-secondary: var(--action-secondary);
+  --color-action-secondary-hover: var(--action-secondary-hover);
 
   /* text */
+
   --color-text-heading: var(--text-heading);
   --color-text-body: var(--text-body);
   --color-text-muted: var(--text-muted);
   --color-text-inverse: var(--text-inverse);
 
   /* borders */
+
   --color-border-default: var(--border-default);
   --color-border-strong: var(--border-strong);
 
   /* status */
+
   --color-status-success: var(--status-success);
   --color-status-warning: var(--status-warning);
   --color-status-error: var(--status-error);
   --color-status-info: var(--status-info);
+
 }
 
 /* ============================================================
-   🧱 BASE ELEMENT STYLES
+   🧱 BASE STYLES
 ============================================================ */
 
 html,
@@ -143,22 +211,20 @@ body {
 }
 
 /* ============================================================
-   🔍 ACCESSIBILITY & UX HELPERS
+   UX HELPERS
 ============================================================ */
 
-/* smooth scroll */
 html {
   scroll-behavior: smooth;
 }
 
-/* default focus outline for keyboard users */
 :focus-visible {
   outline: 2px solid var(--action-primary);
   outline-offset: 2px;
 }
 
 /* ============================================================
-   🧹 RESET IMPROVEMENTS
+   RESET IMPROVEMENTS
 ============================================================ */
 
 img {

@@ -1,3 +1,5 @@
+//farmizo-app\app\(mainwebsite)\page.jsx
+
 "use client";
 
 import Link from "next/link";
@@ -44,11 +46,11 @@ const HOME_CATEGORIES = [
 
 export default function HomePage() {
   const { products, loading, error } = useProducts({ limit: 6 });
- const {
-  categories,
-  loading: categoriesLoading,
-  error: categoriesError,
-} = useCategories();
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
 
   // const products = await fetchFromAPI('products') || [];
   // const mostSoldProducts = products.filter(products => product.isMostSold);
@@ -56,47 +58,86 @@ export default function HomePage() {
   return (
     <main>
       {/* ================= HERO ================= */}
-      <section className="bg-bg-section-soft">
-        <div className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-16 items-center">
+      <section className="bg-gradient-to-b from-green-50 to-white">
+        <div className="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
           {/* LEFT */}
-          <div>
-            <h1 className="text-5xl md:text-6xl font-bold text-text-heading leading-tight">
-              Grow Better.
+          <div className="text-center md:text-left">
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight text-gray-900">
+              Grow Green🪴
               <br />
-              Live Greener. 🌱
+              Live Better 🌼
             </h1>
 
-            <p className="mt-6 text-lg text-text-body max-w-xl">
+            <p className="mt-6 text-lg text-gray-600 max-w-xl mx-auto md:mx-0">
               Discover premium plants, seeds, fertilizers, and gardening
               essentials delivered fresh to your doorstep.
             </p>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <Link
                 href="/products"
-                className="inline-block bg-action-primary hover:bg-action-primary-hover text-text-inverse px-8 py-4 rounded-xl font-semibold transition shadow-md"
+                className="inline-block text-center bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-medium transition w-full sm:w-auto"
               >
                 Shop Plants
               </Link>
 
               <Link
                 href="/categories"
-                className="inline-block border border-border-default px-8 py-4 rounded-xl font-semibold hover:bg-bg-page transition"
+                className="inline-block text-center border border-gray-300 px-6 py-3 rounded-xl hover:bg-gray-100 w-full sm:w-auto"
               >
                 Explore Categories
               </Link>
             </div>
+
+            {/* <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-6 text-sm text-gray-600 mt-6 justify-center md:justify-start">
+              <p>?? 100% Healthy Plants</p>
+              <p>?? Free Delivery Above ?499</p>
+              <p>? 10,000+ Happy Gardeners</p>
+            </div> */}
+
+            {/* <div className="flex flex-wrap gap-3 mt-6 justify-center md:justify-start">
+              <Link
+                href="/categories/plants"
+                className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm hover:bg-green-200"
+              >
+                Indoor Plants
+              </Link>
+              <Link
+                href="/categories/plants"
+                className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm hover:bg-green-200"
+              >
+                Outdoor Plants
+              </Link>
+              <Link
+                href="/categories/seeds"
+                className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm hover:bg-green-200"
+              >
+                Seeds
+              </Link>
+              <Link
+                href="/categories/agriproducts"
+                className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm hover:bg-green-200"
+              >
+                Fertilizers
+              </Link>
+              <Link
+                href="/categories/pots"
+                className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm hover:bg-green-200"
+              >
+                Pots
+              </Link>
+            </div> */}
           </div>
 
           {/* RIGHT */}
-          <div className="relative">
+          <div className="relative order-last md:order-none">
             <Image
               src="https://images.pexels.com/photos/11741418/pexels-photo-11741418.jpeg"
               alt="Fresh plants and gardening supplies"
               width={600}
               height={500}
               priority
-              className="rounded-2xl shadow-lg object-cover"
+              className="rounded-2xl shadow-xl object-cover w-full h-[500px]"
             />
           </div>
         </div>
@@ -204,3 +245,4 @@ export default function HomePage() {
     </main>
   );
 }
+ 

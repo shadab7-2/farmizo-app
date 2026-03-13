@@ -2,18 +2,31 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, ShoppingCart, User, Search, ChevronDown } from "lucide-react";
+import {
+  Menu,
+  X,
+  ShoppingCart,
+  User,
+  Search,
+  ChevronDown,
+  Heart,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useCart from "@/hooks/useCart";
+import { fetchWishlist } from "@/store/slices/wishlistSlice";
 
 export default function Navbar() {
+  const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const accountRef = useRef(null);
   const pathname = usePathname();
   const { totalQty } = useCart();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const wishlistCount = useSelector(
+    (state) => state.wishlist?.wishlistItems?.length || 0,
+  );
 
   const navLinks = [
     { name: "Products", href: "/products" },
@@ -41,6 +54,12 @@ export default function Navbar() {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return (
     <header className="sticky top-0 z-50 bg-bg-page border-b border-border-default">
@@ -99,15 +118,29 @@ export default function Navbar() {
             </button>
 
             {accountOpen && (
-              <div className="absolute right-0 mt-2 w-44 rounded-xl border border-border-default bg-bg-page shadow-lg overflow-hidden">
+              <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border-default bg-bg-page shadow-lg overflow-hidden">
                 {isAuthenticated ? (
                   <>
+                    <Link
+                      href="/profile"
+                      onClick={() => setAccountOpen(false)}
+                      className="block px-4 py-2 text-sm text-text-body hover:bg-bg-section-muted"
+                    >
+                      Profile
+                    </Link>
                     <Link
                       href="/orders"
                       onClick={() => setAccountOpen(false)}
                       className="block px-4 py-2 text-sm text-text-body hover:bg-bg-section-muted"
                     >
                       My Orders
+                    </Link>
+                    <Link
+                      href="/wishlist"
+                      onClick={() => setAccountOpen(false)}
+                      className="block px-4 py-2 text-sm text-text-body hover:bg-bg-section-muted"
+                    >
+                      My Wishlist
                     </Link>
                     <Link
                       href="/cart"
@@ -145,6 +178,29 @@ export default function Navbar() {
               </div>
             )}
           </div>
+
+          {/* Wishlist */}
+          <Link
+            href="/wishlist"
+            className="relative flex items-center text-text-body hover:text-action-primary transition"
+          >
+            <Heart size={22} />
+
+            {wishlistCount > 0 && (
+              <span
+                className="
+        absolute -top-2 -right-3
+        bg-red-500 text-white
+        text-[11px] font-bold
+        min-w-[18px] h-[18px]
+        flex items-center justify-center
+        rounded-full px-1
+      "
+              >
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
 
           {/* Cart */}
           <Link
@@ -194,23 +250,46 @@ export default function Navbar() {
           ))}
 
           {/* Mobile Search */}
-          <div className="flex items-center border border-border-default rounded-full px-3 py-2 bg-bg-page">
+          <form
+            action="/search"
+            method="GET"
+            className="flex items-center border border-border-default rounded-full px-3 py-2 bg-bg-page"
+          >
             <Search size={16} className="text-text-muted" />
             <input
+              name="q"
               placeholder="Search plants..."
               className="ml-2 outline-none w-full bg-transparent text-text-heading placeholder:text-text-muted"
             />
-          </div>
+          </form>
 
           {/* Auth */}
           <div className="border-t border-border-default pt-4 space-y-2">
             {isAuthenticated ? (
               <>
                 <Link
+                  href="/profile"
+                  className="block text-text-body hover:text-action-primary"
+                >
+                  Profile
+                </Link>
+                <Link
                   href="/orders"
                   className="block text-text-body hover:text-action-primary"
                 >
                   My Orders
+                </Link>
+                <Link
+                  href="/wishlist"
+                  className="block text-text-body hover:text-action-primary"
+                >
+                  My Wishlist
+                </Link>
+                <Link
+                  href="/cart"
+                  className="block text-text-body hover:text-action-primary"
+                >
+                  My Cart
                 </Link>
                 <Link
                   href="/logout"

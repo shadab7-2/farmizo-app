@@ -2,9 +2,9 @@
 
 import Image from "@/components/common/SafeImage";
 import Link from "next/link";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import {
   updateCartItem,
@@ -27,13 +27,25 @@ export default function CartPage() {
   }, [dispatch, isAuthenticated]);
 
   /* ================= CALCULATIONS ================= */
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  const currency = useMemo(
+    () => (value) =>
+      new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 0,
+      }).format(Number(value || 0)),
+    [],
   );
 
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const shipping = subtotal > 500 ? 0 : 60;
   const total = subtotal + shipping;
+  const freeShipLeft = Math.max(0, 500 - subtotal);
 
   /* ================= UI ================= */
   return (
@@ -41,162 +53,173 @@ export default function CartPage() {
       {/* ================= HEADER ================= */}
       <section className="bg-bg-section-soft">
         <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <h1 className="text-4xl font-bold text-text-heading">
-            Your Cart
-          </h1>
-
-          <p className="mt-4 text-text-muted">
-            Review your items before checkout.
+          <h1 className="text-4xl font-bold text-text-heading">Your Cart</h1>
+          <p className="mt-3 text-text-muted">
+            {totalItems > 0
+              ? `You have ${totalItems} item${totalItems > 1 ? "s" : ""} ready to order.`
+              : "Review items you love and head to checkout."}
           </p>
         </div>
       </section>
 
       {/* ================= CONTENT ================= */}
       <section className="bg-bg-page">
-        <div className="max-w-7xl mx-auto px-6 py-24 grid lg:grid-cols-3 gap-16">
-
+        <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-3 gap-12">
           {/* LEFT — CART ITEMS */}
-          <div className="lg:col-span-2 space-y-8">
-
+          <div className="lg:col-span-2 space-y-6">
             {cartItems.length === 0 ? (
-              <div className="text-center py-24">
-                <p className="text-lg text-text-muted">
-                  Your cart is empty 🌱
-                </p>
+              <div className="text-center py-20 rounded-2xl border border-dashed border-border-default bg-white">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-bg-section-muted text-action-primary">
+                  <ShoppingBag size={24} />
+                </div>
+                <p className="text-lg font-semibold text-text-heading">Your cart is empty</p>
+                <p className="text-text-muted mt-1">Add some plants and grow your collection.</p>
 
-                <Link
-                  href="/products"
-                  className="inline-block mt-6 bg-action-primary hover:bg-action-primary-hover text-text-inverse px-8 py-4 rounded-xl font-semibold transition"
-                >
-                  Start Shopping
-                </Link>
+                <div className="mt-6 flex justify-center gap-3">
+                  <Link
+                    href="/products"
+                    className="bg-action-primary hover:bg-action-primary-hover text-text-inverse px-6 py-3 rounded-xl font-semibold transition"
+                  >
+                    Start Shopping
+                  </Link>
+                  <Link
+                    href="/categories"
+                    className="border border-border-default px-6 py-3 rounded-xl font-semibold text-text-heading hover:bg-bg-section-muted transition"
+                  >
+                    Explore Categories
+                  </Link>
+                </div>
               </div>
             ) : (
-              cartItems.map((item) => (
-                <div
-                  key={item.product?._id || item.product || item._id}
-                  className="flex flex-col sm:flex-row gap-6 bg-bg-page p-6 rounded-2xl border border-border-default shadow-sm"
-                >
-                  {/* IMAGE */}
-                  <Image
-                    src={item.images?.[0] || "/placeholder.png"}
-                    alt={item.name}
-                    width={120}
-                    height={120}
-                    className="rounded-xl object-cover"
-                  />
+              cartItems.map((item) => {
+                const itemId = item._id || item.productId || item.product;
+                const lineTotal = item.price * item.quantity;
 
-                  {/* INFO */}
-                  <div className="flex-1">
-
-                    <h3 className="text-lg font-semibold text-text-heading">
-                      {item.name}
-                    </h3>
-
-                    <p className="mt-1 text-sm text-text-muted">
-                      ₹{item.price} each
-                    </p>
-
-                    {/* QTY */}
-                    <div className="mt-4 flex items-center gap-3">
-
-                      {/* DECREASE */}
-                      <button
-                        onClick={() =>
-                          dispatch(
-                            updateCartItem({
-                              productId: item._id,
-                              quantity: item.quantity - 1,
-                            })
-                          )
-                        }
-                        disabled={item.quantity === 1}
-                        className="p-2 rounded-lg border border-border-default hover:bg-bg-section-muted transition"
-                      >
-                        <Minus size={16} />
-                      </button>
-
-                      <span className="font-medium">
-                        {item.quantity}
-                      </span>
-
-                      {/* INCREASE */}
-                      <button
-                        onClick={() =>
-                          dispatch(
-                            updateCartItem({
-                              productId: item._id,
-                              quantity: item.quantity + 1,
-                            })
-                          )
-                        }
-                        className="p-2 rounded-lg border border-border-default hover:bg-bg-section-muted transition"
-                      >
-                        <Plus size={16} />
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                  {/* REMOVE */}
-                  <button
-                    onClick={() =>
-                      dispatch(removeCartItem(item._id))
-                    }
-                    className="text-status-error hover:opacity-80 transition"
+                return (
+                  <div
+                    key={itemId}
+                    className="flex flex-col sm:flex-row gap-6 bg-white p-5 rounded-2xl border border-border-default shadow-sm"
                   >
-                    <Trash2 />
-                  </button>
+                    {/* IMAGE */}
+                    <Image
+                      src={item.images?.[0] || "/placeholder.png"}
+                      alt={item.name}
+                      width={110}
+                      height={110}
+                      className="rounded-xl object-cover border border-border-default"
+                    />
 
-                </div>
-              ))
+                    {/* INFO */}
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="text-lg font-semibold text-text-heading">{item.name}</h3>
+                          <p className="text-sm text-text-muted">Price: {currency(item.price)}</p>
+                        </div>
+                        <button
+                          onClick={() => dispatch(removeCartItem(itemId))}
+                          className="text-status-error hover:opacity-80 transition"
+                          aria-label="Remove item"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+
+                      {/* QTY */}
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              updateCartItem({
+                                productId: itemId,
+                                quantity: Math.max(1, item.quantity - 1),
+                              }),
+                            )
+                          }
+                          disabled={item.quantity === 1}
+                          className="p-2 rounded-lg border border-border-default hover:bg-bg-section-muted transition disabled:opacity-50"
+                        >
+                          <Minus size={16} />
+                        </button>
+
+                        <span className="font-semibold text-text-heading">{item.quantity}</span>
+
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              updateCartItem({
+                                productId: itemId,
+                                quantity: item.quantity + 1,
+                              }),
+                            )
+                          }
+                          className="p-2 rounded-lg border border-border-default hover:bg-bg-section-muted transition"
+                        >
+                          <Plus size={16} />
+                        </button>
+
+                        <span className="ml-auto text-sm font-semibold text-text-heading">
+                          {currency(lineTotal)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
             )}
-
           </div>
 
           {/* RIGHT — SUMMARY */}
-          <div className="bg-bg-section-muted p-8 rounded-2xl border border-border-default shadow-sm h-fit">
+          <div className="bg-bg-section-muted p-7 rounded-2xl border border-border-default shadow-sm h-fit space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-text-heading">Order Summary</h2>
+              <p className="text-sm text-text-muted mt-1">
+                {totalItems} item{totalItems !== 1 ? "s" : ""} in your bag
+              </p>
+            </div>
 
-            <h2 className="text-xl font-bold text-text-heading">
-              Order Summary
-            </h2>
-
-            <div className="mt-6 space-y-4 text-sm">
-
+            <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>₹{subtotal}</span>
+                <span className="font-semibold text-text-heading">{currency(subtotal)}</span>
               </div>
 
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>
-                  {shipping === 0 ? "Free" : `₹${shipping}`}
+                <span className="font-semibold text-text-heading">
+                  {shipping === 0 ? "Free" : currency(shipping)}
                 </span>
               </div>
 
-              <div className="border-t border-border-default pt-4 flex justify-between font-semibold text-text-heading">
+              <div className="border-t border-border-default pt-4 flex justify-between text-base font-bold text-text-heading">
                 <span>Total</span>
-                <span>₹{total}</span>
+                <span className="text-action-primary">{currency(total)}</span>
               </div>
 
+              {shipping > 0 ? (
+                <p className="text-xs text-text-muted">
+                  Add items worth {currency(freeShipLeft)} more to unlock free shipping.
+                </p>
+              ) : (
+                <p className="text-xs text-green-700 font-medium">You unlocked free shipping!</p>
+              )}
             </div>
 
             {/* PROTECTED CHECKOUT */}
             <Link
-              href={
-                isAuthenticated
-                  ? "/checkout"
-                  : "/login?redirect=/checkout"
-              }
-              className="mt-8 block text-center bg-action-primary hover:bg-action-primary-hover text-text-inverse py-3 rounded-xl font-semibold transition"
+              href={isAuthenticated ? "/checkout" : "/login?redirect=/checkout"}
+              className="block text-center bg-action-primary hover:bg-action-primary-hover text-text-inverse py-3 rounded-xl font-semibold transition shadow-sm shadow-action-primary/10"
             >
               Proceed to Checkout
             </Link>
 
+            <Link
+              href="/products"
+              className="block text-center border border-border-default py-3 rounded-xl font-semibold text-text-heading hover:bg-white transition"
+            >
+              Continue Shopping
+            </Link>
           </div>
-
         </div>
       </section>
     </main>

@@ -12,7 +12,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParam = useSearchParams();
 
-  const redirect = searchParam.get("redirect") || "/";
+  const redirect = searchParam.get("redirect");
 
   const { loading, error } = useSelector((state) => state.auth);
 
@@ -24,8 +24,12 @@ export default function LoginPage() {
 
     const res = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(res)) {
+      const loggedInUser = res.payload?.user || res.payload || null;
+      const roleBasedRedirect = loggedInUser?.role === "admin" ? "/admin" : "/";
+      const nextPath = redirect || roleBasedRedirect;
+
       toast.success("Login successful");
-      router.push(redirect);
+      router.push(nextPath);
     } else {
       toast.error(res.payload || "Login failed");
     }

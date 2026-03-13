@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:5000/api";
+﻿const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 const isUsableToken = (value) => {
   if (!value) return false;
@@ -7,6 +8,8 @@ const isUsableToken = (value) => {
 };
 
 export async function fetchFromAPI(endpoint, options = {}) {
+  let res;   
+
   try {
     const rawToken =
       typeof window !== "undefined"
@@ -14,7 +17,7 @@ export async function fetchFromAPI(endpoint, options = {}) {
         : null;
     const token = isUsableToken(rawToken) ? String(rawToken).trim() : null;
 
-    const res = await fetch(`${BASE_URL}/${endpoint}`, {
+    res = await fetch(`${BASE_URL}/${endpoint}`, {
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -35,15 +38,19 @@ export async function fetchFromAPI(endpoint, options = {}) {
       throw new Error(json.message || "API request failed");
     }
 
-    // 🔥 IMPORTANT: return only actual data
     return json.data;
   } catch (error) {
-    const contentType = res.headers.get("content-type") || "";
-    const data = contentType.includes("application/json")
-      ? await res.json()
-      : { message: await res.text() };
+    if (res) {
+      const contentType = res.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await res.json()
+        : { message: await res.text() };
 
-    console.error("❌ API Fetch Error:", data.message);
+      console.error("API Fetch Error:", data.message);
+    } else {
+      console.error("API Fetch Error:", error.message);
+    }
+
     throw error;
   }
 }
