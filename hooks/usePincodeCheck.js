@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { checkPincode } from "@/services/delivery.service";
 
-export function usePincodeCheck() {
+export default function usePincodeCheck() {
   const [status, setStatus] = useState({ loading: false, serviceable: null, deliveryDays: null, codAvailable: null });
   const [error, setError] = useState("");
 

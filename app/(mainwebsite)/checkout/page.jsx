@@ -3,6 +3,8 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { validateAddressForm } from "@/utils/validation";
+import {useCheckoutTotals} from "@/hooks/useCheckoutTotals";
 import Image from "@/components/common/SafeImage";
 import Script from "next/script";
 
@@ -14,7 +16,7 @@ import {
   addAddress as addAddressAction,
   fetchAddresses,
   setDefaultAddress as setDefaultAddressAction,
-deleteAddress as deleteAddressAction,
+  deleteAddress as deleteAddressAction,
   updateAddress as updateAddressAction,
 } from "@/store/slices/addressSlice";
 import {
@@ -24,7 +26,7 @@ import {
 import toast from "react-hot-toast";
 import AddressSelector from "@/components/address/AddressSelector";
 import AddressForm from "@/components/address/AddressForm";
-import { usePincodeCheck } from "@/hooks/usePincodeCheck";
+import  usePincodeCheck  from "@/hooks/usePincodeCheck";
 
 export default function CheckoutPage() {
   const dispatch = useDispatch();
@@ -35,22 +37,14 @@ export default function CheckoutPage() {
   const user = useSelector((state) => state.auth.user);
   const addresses = useSelector((state) => state.address.list);
 
-const subtotal = useMemo(() => {
-  return cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-}, [cartItems]);
-const deliveryDays = useMemo(() => 3 + Math.floor(Math.random() * 3), []);
-const { status: pincodeStatus, error: pincodeError, runCheck } = usePincodeCheck();
-const isPincodeBlocked = pincodeStatus.serviceable === false;
-const [locationStatus, setLocationStatus] = useState({
-  autoFilled: false,
-  success: null,
-  message: "",
-});
-
-  const shipping = subtotal > 500 ? 0 : 60;
+  const deliveryDays = useMemo(() => 3 + Math.floor(Math.random() * 3), []);
+  const { status: pincodeStatus, error: pincodeError, runCheck } = usePincodeCheck();
+  const isPincodeBlocked = pincodeStatus.serviceable === false;
+  const [locationStatus, setLocationStatus] = useState({
+    autoFilled: false,
+    success: null,
+    message: "",
+  });
 
   const [form, setForm] = useState({
     fullName: "",
@@ -70,7 +64,7 @@ const [locationStatus, setLocationStatus] = useState({
   const [loading, setLoading] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("razorpay");
+  const [paymentMethod, setPaymentMethod] = useState("cod"); // default to COD for initial rollout
   const [lastPaymentError, setLastPaymentError] = useState("");
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -82,8 +76,10 @@ const [locationStatus, setLocationStatus] = useState({
   const [couponSuccess, setCouponSuccess] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
-  const discount = Math.min(appliedCoupon?.discount || 0, subtotal);
-  const total = Math.max(subtotal - discount, 0) + shipping;
+  const { subtotal, shipping, discount, total } = useCheckoutTotals(
+    cartItems,
+    appliedCoupon,
+  );
 
   const formatMoney = (value) => Number(value || 0).toFixed(2);
 
@@ -151,37 +147,7 @@ const [locationStatus, setLocationStatus] = useState({
     setCouponSuccess("");
   }, [subtotal]);
 
-  const validateForm = (values) => {
-    const errors = {};
-    const requiredFields = [
-      "fullName",
-      "phone",
-      "street",
-      "city",
-      "state",
-      "pincode",
-      "country",
-    ];
-
-    requiredFields.forEach((field) => {
-      if (!String(values[field] || "").trim()) {
-        errors[field] = "This field is required";
-      }
-    });
-
-    if (values.phone && !/^\d{10}$/.test(values.phone.trim())) {
-      errors.phone = "Phone number must be exactly 10 digits";
-    }
-
-    // Postal code validation (exactly 6 digits)
-    if (values.pincode && !/^\d{6}$/.test(values.pincode.trim())) {
-      errors.pincode = "Pincode must be exactly 6 digits";
-    }
-
-    return errors;
-  };
-
-  const formErrors = useNewAddress ? validateForm(form) : {};
+  const formErrors = useNewAddress ? validateAddressForm(form) : {};
   const isFormValid = Object.keys(formErrors).length === 0;
   const isCartEmpty = cartItems.length === 0;
   const isSubmitDisabled = loading || isCartEmpty;
@@ -283,13 +249,13 @@ const [locationStatus, setLocationStatus] = useState({
         setLocationStatus({
           autoFilled: true,
           success: true,
-          message: "✓ City and State detected automatically",
+          message: "City and State detected automatically",
         });
       } else {
         setLocationStatus({
           autoFilled: false,
           success: false,
-          message: "❌ Invalid Pincode",
+          message: "Invalid pincode",
         });
       }
     } catch (err) {
@@ -375,7 +341,7 @@ const [locationStatus, setLocationStatus] = useState({
       null;
 
     if (useNewAddress || !selectedAddress) {
-      const errors = validateForm(form);
+      const errors = validateAddressForm(form);
       if (Object.keys(errors).length > 0) {
         setTouched({
           fullName: true,
@@ -395,20 +361,47 @@ const [locationStatus, setLocationStatus] = useState({
     try {
       setLoading(true);
 
-      const shippingAddress =
-        !useNewAddress && selectedAddress
-          ? selectedAddress
-          : {
-              fullName: form.fullName,
-              phone: form.phone,
-              street: form.street,
-              city: form.city,
-              state: form.state,
-              pincode: form.pincode,
-              country: form.country,
-              label: form.label || "Home",
-              isDefault: saveAddress && addresses.length === 0,
-            };
+      const normalizedSelected = selectedAddress
+        ? {
+            ...selectedAddress,
+            // Backward compatibility for old address shape and nullables
+            street: selectedAddress.street || selectedAddress.address || form.street || "",
+            city: selectedAddress.city || form.city || "",
+            state: selectedAddress.state || form.state || "",
+            pincode: selectedAddress.pincode || selectedAddress.postalCode || form.pincode || "",
+            country: selectedAddress.country || form.country || "",
+            fullName: selectedAddress.fullName || selectedAddress.name || form.fullName || "",
+            phone: selectedAddress.phone || form.phone || "",
+          }
+        : null;
+
+      const buildShipping = !useNewAddress && normalizedSelected
+        ? normalizedSelected
+        : {
+            fullName: form.fullName,
+            phone: form.phone,
+            street: form.street,
+            city: form.city,
+            state: form.state,
+            pincode: form.pincode,
+            country: form.country,
+            label: form.label || "Home",
+            isDefault: saveAddress && addresses.length === 0,
+          };
+
+      // sanitize/trim everything to satisfy backend required fields
+      const shippingAddress = Object.fromEntries(
+        Object.entries(buildShipping || {}).map(([k, v]) => [k, typeof v === "string" ? v.trim() : v]),
+      );
+
+      const requiredShipping = ["fullName", "phone", "street", "city", "state", "pincode", "country"];
+      const missing = requiredShipping.filter((key) => !String(shippingAddress?.[key] || "").trim());
+      if (missing.length) {
+        setSubmitError("Please complete the shipping address (missing: " + missing.join(", ") + ").");
+        toast.error("Shipping address incomplete");
+        setLoading(false);
+        return;
+      }
 
       // Save Address if checked and using a new address
       if (useNewAddress && saveAddress && isAuthenticated) {
@@ -548,7 +541,7 @@ const [locationStatus, setLocationStatus] = useState({
       return (
         <main className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
           <h2 className="text-2xl font-semibold mb-2 text-text-heading">
-            Finalizing your order…
+            Finalizing your order...
           </h2>
           <p className="text-text-muted">Redirecting to confirmation page.</p>
         </main>
@@ -653,6 +646,7 @@ const [locationStatus, setLocationStatus] = useState({
                         setUseNewAddress(false);
                         setEditingAddressId(null);
                       }}
+                      asForm={false}
                   />
                 </div>
               )}
@@ -734,12 +728,12 @@ const [locationStatus, setLocationStatus] = useState({
                     )}
                     {field.name === "pincode" && pincodeStatus.serviceable === true && (
                       <p className="mt-1 text-xs font-semibold text-green-600">
-                        ✓ Delivery available in {pincodeStatus.deliveryDays || 3}-{(pincodeStatus.deliveryDays || 3) + 2} days
+                        Delivery available in {pincodeStatus.deliveryDays || 3}-{(pincodeStatus.deliveryDays || 3) + 2} days
                       </p>
                     )}
                     {field.name === "pincode" && pincodeStatus.serviceable === false && (
                       <p className="mt-1 text-xs font-semibold text-red-600">
-                        ❌ Delivery not available
+                        Delivery not available
                       </p>
                     )}
                     {field.name === "pincode" && pincodeError && (
@@ -891,7 +885,7 @@ const [locationStatus, setLocationStatus] = useState({
                 </label>
                 {lastPaymentError && (
                   <p className="text-sm text-red-600">
-                    Payment failed: {lastPaymentError} — click Place Order to
+                    Payment failed: {lastPaymentError} - click Place Order to
                     retry.
                   </p>
                 )}
@@ -911,7 +905,7 @@ const [locationStatus, setLocationStatus] = useState({
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-3 py-3">
-                  <span className="text-lg">🚚</span>
+                  <span className="text-sm font-semibold text-text-heading">Delivery</span>
                   <div>
                     <p className="text-sm font-semibold text-text-heading">Estimated Delivery</p>
                     <div className="text-sm text-green-600">
@@ -932,7 +926,7 @@ const [locationStatus, setLocationStatus] = useState({
                       alt={item.name}
                       width={56}
                       height={56}
-                      className="rounded-lg object-cover flex-shrink-0 border border-border-default"
+                      className="rounded-lg object-cover shrink-0 border border-border-default"
                     />
 
                     <div className="flex-1 min-w-0">
@@ -1096,7 +1090,7 @@ const [locationStatus, setLocationStatus] = useState({
                   </>
                 ) : (
                   <>
-                    Confirm & Pay
+                    {paymentMethod === "cod" ? "Place Order (COD)" : "Confirm & Pay"}
                     <svg
                       className="w-5 h-5 group-hover:translate-x-1 transition-transform"
                       fill="none"
