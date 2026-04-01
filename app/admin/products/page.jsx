@@ -11,6 +11,7 @@ import {
   clearProductError,
 } from "@/store/slices/productSlice";
 import { fetchCategories } from "@/services/category.service";
+import styles from "./ProductPage.module.css";
 
 const emptyForm = {
   name: "",
@@ -228,312 +229,463 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold">All Products</h1>
-
-      {error && (
-        <div className="rounded border border-red-300 bg-red-50 px-4 py-3 text-red-700">
-          {error}
+    <div className={styles.page}>
+      <header className={styles.header}>
+        <div>
+          <p className={styles.kicker}>Products</p>
+          <h1 className={styles.title}>All Products</h1>
+          <p className={styles.subtitle}>
+            Manage catalog, pricing, inventory, and status in one streamlined view.
+          </p>
         </div>
-      )}
+        <div className={styles.statusPill}>
+          {products.length} items • {categories.length} categories
+        </div>
+      </header>
 
-      <form
-        onSubmit={onCreateSubmit}
-        className="grid gap-3 rounded bg-white p-4 shadow md:grid-cols-2"
-      >
-        <input
-          className="border p-2 rounded"
-          placeholder="Name"
-          value={createForm.name}
-          onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))}
-          required
-        />
+      {error && <div className={styles.errorBanner}>{error}</div>}
 
-        <select
-          className="border p-2 rounded"
-          value={createForm.categoryId}
-          onChange={(e) =>
-            setCreateForm((prev) => ({ ...prev, categoryId: e.target.value }))
-          }
-          required
-          disabled={categoriesLoading}
-        >
-          <option value="">{categoriesLoading ? "Loading categories..." : "Select category"}</option>
-          {categories.map((category) => (
-            <option key={category._id} value={category._id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-
-        <input
-          className="border p-2 rounded"
-          placeholder="Price"
-          type="number"
-          min="0"
-          step="0.01"
-          value={createForm.price}
-          onChange={(e) => setCreateForm((prev) => ({ ...prev, price: e.target.value }))}
-          required
-        />
-
-        <input
-          className="border p-2 rounded"
-          placeholder="Stock"
-          type="number"
-          min="0"
-          value={createForm.stock}
-          onChange={(e) => setCreateForm((prev) => ({ ...prev, stock: e.target.value }))}
-        />
-
-        <div className="md:col-span-2">
-          <label className="mb-2 block text-sm font-medium">Product Images</label>
-          <input
-            className="border p-2 rounded w-full"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={onCreateImagesChange}
-          />
-
-          {createPreviews.length > 0 && (
-            <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-6">
-              {createPreviews.map((src) => (
-                <Image
-                  key={src}
-                  src={src}
-                  alt="Preview"
-                  width={96}
-                  height={80}
-                  unoptimized
-                  className="h-20 w-full rounded border object-cover"
-                />
-              ))}
-            </div>
-          )}
+      <section className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div>
+            <p className={styles.kicker}>Create Product</p>
+            <h2 className={styles.sectionTitle}>Add a new item</h2>
+          </div>
+          <div className={styles.badgeAccent}>Instant publish</div>
         </div>
 
-        <textarea
-          className="border p-2 rounded md:col-span-2"
-          placeholder="Description"
-          value={createForm.description}
-          onChange={(e) =>
-            setCreateForm((prev) => ({ ...prev, description: e.target.value }))
-          }
-          rows={3}
-          required
-        />
+        <form onSubmit={onCreateSubmit} className={styles.formGrid}>
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Name</label>
+            <input
+              className={styles.input}
+              placeholder="Organic fertilizer pack"
+              value={createForm.name}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, name: e.target.value }))}
+              required
+            />
+          </div>
 
-        <label className="flex items-center gap-2 text-sm md:col-span-2">
-          <input
-            type="checkbox"
-            checked={createForm.isActive}
-            onChange={(e) =>
-              setCreateForm((prev) => ({ ...prev, isActive: e.target.checked }))
-            }
-          />
-          Active Product
-        </label>
-
-        <button
-          type="submit"
-          disabled={actionLoading}
-          className="w-fit rounded bg-green-600 px-4 py-2 text-white disabled:opacity-60"
-        >
-          {actionLoading ? "Saving..." : "Create Product"}
-        </button>
-      </form>
-
-      {loading ? (
-        <p>Loading products...</p>
-      ) : (
-        <div className="space-y-4">
-          {products.map((product) => (
-            <div
-              key={product._id}
-              className="bg-white p-6 rounded shadow flex flex-col gap-4 md:flex-row md:justify-between md:items-center"
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Category</label>
+            <select
+              className={styles.input}
+              value={createForm.categoryId}
+              onChange={(e) =>
+                setCreateForm((prev) => ({ ...prev, categoryId: e.target.value }))
+              }
+              required
+              disabled={categoriesLoading}
             >
-              <div>
-                <p className="font-semibold">{product.name}</p>
-                <p className="text-sm text-gray-500">₹{product.price}</p>
-                <p className="text-xs text-gray-500">
-                  {product.categoryName || product.categoryId?.name || product.category} | Stock: {product.stock} | {product.isActive ? "Active" : "Inactive"}
-                </p>
+              <option value="">
+                {categoriesLoading ? "Loading categories..." : "Select category"}
+              </option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                {Array.isArray(product.images) && product.images.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {product.images.slice(0, 4).map((src) => (
-                      <Image
-                        key={src}
-                        src={src}
-                        alt={product.name}
-                        width={48}
-                        height={48}
-                        unoptimized
-                        className="h-12 w-12 rounded border object-cover"
-                      />
-                    ))}
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Price</label>
+            <input
+              className={styles.input}
+              placeholder="499"
+              type="number"
+              min="0"
+              step="0.01"
+              value={createForm.price}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, price: e.target.value }))}
+              required
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Stock</label>
+            <input
+              className={styles.input}
+              placeholder="150"
+              type="number"
+              min="0"
+              value={createForm.stock}
+              onChange={(e) => setCreateForm((prev) => ({ ...prev, stock: e.target.value }))}
+            />
+          </div>
+
+          <div className={styles.inputGroupFull}>
+            <label className={styles.label}>Product Images</label>
+            <label className={styles.fileUpload}>
+              <span className={styles.fileIcon}>📁</span>
+              <span>
+                <strong>Upload</strong> or drag & drop
+                <span className={styles.fileHint}> PNG, JPG up to 5MB each </span>
+              </span>
+              <input
+                className={styles.fileInput}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={onCreateImagesChange}
+              />
+            </label>
+
+            {createPreviews.length > 0 && (
+              <div className={styles.previewGrid}>
+                {createPreviews.map((src) => (
+                  <div key={src} className={styles.previewItem}>
+                    <Image
+                      src={src}
+                      alt="Preview"
+                      width={96}
+                      height={80}
+                      unoptimized
+                      className={styles.previewImage}
+                    />
                   </div>
-                )}
+                ))}
               </div>
+            )}
+          </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => onToggleActive(product)}
-                  className={product.isActive ? "text-orange-600" : "text-green-600"}
-                  disabled={actionLoading}
-                >
-                  {product.isActive ? "Disable" : "Enable"}
-                </button>
+          <div className={styles.inputGroupFull}>
+            <label className={styles.label}>Description</label>
+            <textarea
+              className={`${styles.input} ${styles.textarea}`}
+              placeholder="Add details that help merchants and customers understand the product."
+              value={createForm.description}
+              onChange={(e) =>
+                setCreateForm((prev) => ({ ...prev, description: e.target.value }))
+              }
+              rows={3}
+              required
+            />
+          </div>
 
-                <button
-                  onClick={() => openEditModal(product)}
-                  className="text-blue-600"
-                  disabled={actionLoading}
-                >
-                  Edit
-                </button>
-
-                <button
-                  onClick={() => onDelete(product._id)}
-                  className="text-red-600"
-                  disabled={actionLoading}
-                >
-                  Delete
-                </button>
-              </div>
+          <div className={styles.switchRow}>
+            <div className={styles.switchLabel}>
+              <p className={styles.label}>Active Product</p>
+              <p className={styles.helper}>Visible to shoppers immediately.</p>
             </div>
-          ))}
+            <label className={styles.switch}>
+              <input
+                type="checkbox"
+                checked={createForm.isActive}
+                onChange={(e) =>
+                  setCreateForm((prev) => ({ ...prev, isActive: e.target.checked }))
+                }
+              />
+              <span className={styles.slider} />
+            </label>
+          </div>
 
-          {!products.length && <p className="text-gray-500">No products found.</p>}
+          <div className={styles.actions}>
+            <button type="submit" disabled={actionLoading} className={styles.primaryButton}>
+              {actionLoading ? "Saving..." : "Create Product"}
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div>
+            <p className={styles.kicker}>Product List</p>
+            <h2 className={styles.sectionTitle}>Catalog overview</h2>
+          </div>
+          <div className={styles.badgeMuted}>{loading ? "Syncing..." : "Up to date"}</div>
         </div>
-      )}
+
+        {loading ? (
+          <div className={styles.skeletonGrid}>
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className={styles.skeletonCard}>
+                <div className={styles.skeletonThumb} />
+                <div className={styles.skeletonContent}>
+                  <div className={styles.skeletonLineWide} />
+                  <div className={styles.skeletonLine} />
+                  <div className={styles.skeletonBadgeRow}>
+                    <div className={styles.skeletonBadge} />
+                    <div className={styles.skeletonBadge} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={styles.productsGrid}>
+            {products.map((product) => {
+              const displayImage =
+                Array.isArray(product.images) && product.images.length > 0
+                  ? product.images[0]
+                  : null;
+
+              return (
+                <article key={product._id} className={styles.productCard}>
+                  <div className={styles.productMedia}>
+                    {displayImage ? (
+                      <Image
+                        src={displayImage}
+                        alt={product.name}
+                        width={72}
+                        height={72}
+                        unoptimized
+                        className={styles.productImage}
+                      />
+                    ) : (
+                      <div className={styles.imagePlaceholder}>🌱</div>
+                    )}
+                  </div>
+
+                  <div className={styles.productInfo}>
+                    <div className={styles.productTitleRow}>
+                      <h3 className={styles.productName}>{product.name}</h3>
+                      <span className={styles.priceTag}>₹{product.price}</span>
+                    </div>
+                    <p className={styles.productMeta}>
+                      {product.categoryName || product.categoryId?.name || product.category || "Uncategorized"}
+                    </p>
+                    <div className={styles.badgeRow}>
+                      <span className={styles.stockBadge}>
+                        Stock: {product.stock ?? 0}
+                      </span>
+                      <span
+                        className={
+                          product.isActive ? styles.activeBadge : styles.inactiveBadge
+                        }
+                      >
+                        {product.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+
+                    {Array.isArray(product.images) && product.images.length > 1 && (
+                      <div className={styles.thumbRow}>
+                        {product.images.slice(1, 5).map((src) => (
+                          <Image
+                            key={src}
+                            src={src}
+                            alt={product.name}
+                            width={40}
+                            height={40}
+                            unoptimized
+                            className={styles.thumbImage}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.productActions}>
+                    <button
+                      onClick={() => onToggleActive(product)}
+                      className={styles.iconButton}
+                      disabled={actionLoading}
+                      aria-label={product.isActive ? "Disable product" : "Enable product"}
+                      title={product.isActive ? "Disable" : "Enable"}
+                    >
+                      ⚡
+                    </button>
+
+                    <button
+                      onClick={() => openEditModal(product)}
+                      className={styles.iconButton}
+                      disabled={actionLoading}
+                      aria-label="Edit product"
+                      title="Edit"
+                    >
+                      ✏️
+                    </button>
+
+                    <button
+                      onClick={() => onDelete(product._id)}
+                      className={`${styles.iconButton} ${styles.danger}`}
+                      disabled={actionLoading}
+                      aria-label="Delete product"
+                      title="Delete"
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+
+            {!products.length && (
+              <div className={styles.emptyState}>No products yet 🌱</div>
+            )}
+          </div>
+        )}
+      </section>
 
       {isEditOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl rounded bg-white p-5 shadow-lg">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Edit Product</h2>
-              <button onClick={closeEditModal} className="text-gray-500">
-                Close
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <div>
+                <p className={styles.kicker}>Edit Product</p>
+                <h2 className={styles.sectionTitle}>Update details</h2>
+              </div>
+              <button onClick={closeEditModal} className={styles.closeButton}>
+                ✕
               </button>
             </div>
 
-            <form onSubmit={onEditSubmit} className="grid gap-3 md:grid-cols-2">
-              <input
-                className="border p-2 rounded"
-                placeholder="Name"
-                value={editForm.name}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
-                required
-              />
-
-              <select
-                className="border p-2 rounded"
-                value={editForm.categoryId}
-                onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, categoryId: e.target.value }))
-                }
-                required
-                disabled={categoriesLoading}
-              >
-                <option value="">{categoriesLoading ? "Loading categories..." : "Select category"}</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                className="border p-2 rounded"
-                placeholder="Price"
-                type="number"
-                min="0"
-                step="0.01"
-                value={editForm.price}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, price: e.target.value }))}
-                required
-              />
-
-              <input
-                className="border p-2 rounded"
-                placeholder="Stock"
-                type="number"
-                min="0"
-                value={editForm.stock}
-                onChange={(e) => setEditForm((prev) => ({ ...prev, stock: e.target.value }))}
-              />
-
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-medium">Replace Images</label>
+            <form onSubmit={onEditSubmit} className={styles.formGrid}>
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Name</label>
                 <input
-                  className="border p-2 rounded w-full"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={onEditImagesChange}
+                  className={styles.input}
+                  placeholder="Product name"
+                  value={editForm.name}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  required
                 />
+              </div>
 
-                {Array.isArray(editingProduct?.images) && editingProduct.images.length > 0 && editPreviews.length === 0 && (
-                  <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-6">
-                    {editingProduct.images.map((src) => (
-                      <Image
-                        key={src}
-                        src={src}
-                        alt="Current"
-                        width={96}
-                        height={80}
-                        unoptimized
-                        className="h-20 w-full rounded border object-cover"
-                      />
-                    ))}
-                  </div>
-                )}
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Category</label>
+                <select
+                  className={styles.input}
+                  value={editForm.categoryId}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({ ...prev, categoryId: e.target.value }))
+                  }
+                  required
+                  disabled={categoriesLoading}
+                >
+                  <option value="">
+                    {categoriesLoading ? "Loading categories..." : "Select category"}
+                  </option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Price</label>
+                <input
+                  className={styles.input}
+                  placeholder="0.00"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editForm.price}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({ ...prev, price: e.target.value }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.label}>Stock</label>
+                <input
+                  className={styles.input}
+                  placeholder="0"
+                  type="number"
+                  min="0"
+                  value={editForm.stock}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({ ...prev, stock: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className={styles.inputGroupFull}>
+                <label className={styles.label}>Replace Images</label>
+                <label className={styles.fileUpload}>
+                  <span className={styles.fileIcon}>📁</span>
+                  <span>
+                    <strong>Upload</strong> new gallery
+                    <span className={styles.fileHint}> Replaces existing images </span>
+                  </span>
+                  <input
+                    className={styles.fileInput}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={onEditImagesChange}
+                  />
+                </label>
+
+                {Array.isArray(editingProduct?.images) &&
+                  editingProduct.images.length > 0 &&
+                  editPreviews.length === 0 && (
+                    <div className={styles.previewGrid}>
+                      {editingProduct.images.map((src) => (
+                        <div key={src} className={styles.previewItem}>
+                          <Image
+                            src={src}
+                            alt="Current"
+                            width={96}
+                            height={80}
+                            unoptimized
+                            className={styles.previewImage}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                 {editPreviews.length > 0 && (
-                  <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-6">
+                  <div className={styles.previewGrid}>
                     {editPreviews.map((src) => (
-                      <Image
-                        key={src}
-                        src={src}
-                        alt="Preview"
-                        width={96}
-                        height={80}
-                        unoptimized
-                        className="h-20 w-full rounded border object-cover"
-                      />
+                      <div key={src} className={styles.previewItem}>
+                        <Image
+                          src={src}
+                          alt="Preview"
+                          width={96}
+                          height={80}
+                          unoptimized
+                          className={styles.previewImage}
+                        />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <textarea
-                className="border p-2 rounded md:col-span-2"
-                placeholder="Description"
-                value={editForm.description}
-                onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, description: e.target.value }))
-                }
-                rows={3}
-                required
-              />
-
-              <label className="flex items-center gap-2 text-sm md:col-span-2">
-                <input
-                  type="checkbox"
-                  checked={editForm.isActive}
+              <div className={styles.inputGroupFull}>
+                <label className={styles.label}>Description</label>
+                <textarea
+                  className={`${styles.input} ${styles.textarea}`}
+                  placeholder="Describe the product, materials, and key selling points."
+                  value={editForm.description}
                   onChange={(e) =>
-                    setEditForm((prev) => ({ ...prev, isActive: e.target.checked }))
+                    setEditForm((prev) => ({ ...prev, description: e.target.value }))
                   }
+                  rows={3}
+                  required
                 />
-                Active Product
-              </label>
+              </div>
 
-              <div className="md:col-span-2 flex justify-end gap-3">
+              <div className={styles.switchRow}>
+                <div className={styles.switchLabel}>
+                  <p className={styles.label}>Active Product</p>
+                  <p className={styles.helper}>Toggle availability instantly.</p>
+                </div>
+                <label className={styles.switch}>
+                  <input
+                    type="checkbox"
+                    checked={editForm.isActive}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, isActive: e.target.checked }))
+                    }
+                  />
+                  <span className={styles.slider} />
+                </label>
+              </div>
+
+              <div className={styles.modalActions}>
                 <button
                   type="button"
-                  className="rounded border px-4 py-2"
+                  className={styles.secondaryButton}
                   onClick={closeEditModal}
                   disabled={actionLoading}
                 >
@@ -542,7 +694,7 @@ export default function AdminProductsPage() {
 
                 <button
                   type="submit"
-                  className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-60"
+                  className={styles.primaryButton}
                   disabled={actionLoading}
                 >
                   {actionLoading ? "Updating..." : "Update Product"}

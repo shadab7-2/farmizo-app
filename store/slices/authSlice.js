@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "@/services/api";
+import api, { setAccessToken } from "@/services/api";
 
 const isUsableToken = (value) => {
   if (!value) return false;
@@ -42,6 +42,13 @@ export const loadUser = createAsyncThunk(
   "auth/loadUser",
   async (_, { rejectWithValue }) => {
     try {
+      if (typeof window !== "undefined") {
+        const savedToken = localStorage.getItem("farmizo_token");
+        if (isUsableToken(savedToken)) {
+          setAccessToken(String(savedToken).trim());
+        }
+      }
+
       const res = await api.get("/auth/me");
       return res.data.data;
     } catch (err) {
@@ -96,10 +103,12 @@ const authSlice = createSlice({
 
         // SAVE TOKEN
         if (typeof window !== "undefined") {
-          const token = action.payload?.token;
+          const token = action.payload?.accessToken || action.payload?.token;
           if (isUsableToken(token)) {
+            setAccessToken(String(token).trim());
             localStorage.setItem("farmizo_token", String(token).trim());
           } else {
+            setAccessToken(null);
             localStorage.removeItem("farmizo_token");
             localStorage.removeItem("token");
           }
@@ -116,10 +125,12 @@ const authSlice = createSlice({
         state.isAuthenticated = !!state.user;
 
         if (typeof window !== "undefined") {
-          const token = action.payload?.token;
+          const token = action.payload?.accessToken || action.payload?.token;
           if (isUsableToken(token)) {
+            setAccessToken(String(token).trim());
             localStorage.setItem("farmizo_token", String(token).trim());
           } else {
+            setAccessToken(null);
             localStorage.removeItem("farmizo_token");
             localStorage.removeItem("token");
           }
@@ -140,6 +151,7 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
+        setAccessToken(null);
         localStorage.removeItem("farmizo_token");
       });
   },

@@ -15,11 +15,13 @@ export default function AdminStatCard({
   icon: Icon,
   iconBgClass = "bg-emerald-100",
   iconClass = "text-emerald-700",
+  growthLabel = "vs previous period",
+  gradientClass = "from-emerald-50 to-white",
 }) {
   const isPositive = Number(trend) >= 0;
 
   return (
-    <div className="rounded-2xl border border-border-default bg-white/95 p-5 shadow-sm transition hover:shadow-md">
+    <div className={`relative overflow-hidden rounded-2xl border border-border-default bg-gradient-to-br ${gradientClass} p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-xl`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-text-muted">{title}</p>
@@ -38,7 +40,7 @@ export default function AdminStatCard({
         )}
         <span className={isPositive ? "text-green-700" : "text-red-700"}>
           {isPositive ? "+" : "-"}
-          {formatTrend(trend)} vs last month
+          {formatTrend(trend)} {growthLabel}
         </span>
       </div>
     </div>

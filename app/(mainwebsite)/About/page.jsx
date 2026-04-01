@@ -28,13 +28,13 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div>
+          <div className="flex justify-center">
             <Image
               src="https://images.pexels.com/photos/6508765/pexels-photo-6508765.jpeg"
               alt="Farmizo nursery and plants"
-              width={600}
-              height={450}
-              className="rounded-2xl shadow-lg object-cover"
+              width={520}
+              height={360}
+              className="h-[360px] w-full max-w-[520px] rounded-2xl shadow-lg object-cover"
             />
           </div>
 

@@ -6,6 +6,7 @@ import {
   getAdminOrders,
   updateAdminOrderStatus,
 } from "@/services/order.service";
+import useDebounce from "@/hooks/useDebounce";
 import OrderStats from "./components/OrderStats";
 import OrderFilters from "./components/OrderFilters";
 import OrderTable from "./components/OrderTable";
@@ -27,8 +28,8 @@ export default function AdminOrdersPage() {
     totalItems: 0,
     totalPages: 1,
   });
-  const [searchInput, setSearchInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [page, setPage] = useState(1);
@@ -40,16 +41,8 @@ export default function AdminOrdersPage() {
   const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setSearchQuery(searchInput.trim());
-    }, 350);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchInput]);
-
-  useEffect(() => {
     setPage(1);
-  }, [searchQuery, statusFilter, dateFilter]);
+  }, [debouncedSearch, statusFilter, dateFilter]);
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
@@ -59,7 +52,7 @@ export default function AdminOrdersPage() {
       const response = await getAdminOrders({
         page,
         limit: PAGE_SIZE,
-        search: searchQuery,
+        search: debouncedSearch,
         status: statusFilter,
         dateFilter,
       });
@@ -73,7 +66,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [dateFilter, page, searchQuery, statusFilter]);
+  }, [dateFilter, page, debouncedSearch, statusFilter]);
 
   useEffect(() => {
     loadOrders();
@@ -154,8 +147,8 @@ export default function AdminOrdersPage() {
       <OrderStats summary={summary} loading={loading} />
 
       <OrderFilters
-        search={searchInput}
-        onSearchChange={setSearchInput}
+        search={search}
+        onSearchChange={setSearch}
         status={statusFilter}
         onStatusChange={setStatusFilter}
         dateFilter={dateFilter}

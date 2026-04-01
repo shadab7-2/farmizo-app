@@ -16,7 +16,7 @@ const formatStatus = (status = "") =>
     .replace(/_/g, " ")
     .replace(/\b\w/g, (m) => m.toUpperCase());
 
-export default function RecentOrders({ orders = [] }) {
+export default function RecentOrders({ orders = [], onStatusChange }) {
   return (
     <div className="rounded-2xl border border-border-default bg-white p-6 shadow-sm">
       <h3 className="text-lg font-semibold text-text-heading">Recent Orders</h3>
@@ -46,13 +46,17 @@ export default function RecentOrders({ orders = [] }) {
                   <td className="py-3">{order.customerName || "Guest"}</td>
                   <td className="py-3">{formatMoney(order.totalAmount)}</td>
                   <td className="py-3">
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
-                        statusClasses[order.orderStatus] || "bg-slate-100 text-slate-700"
-                      }`}
+                    <select
+                      value={order.orderStatus}
+                      onChange={(e) => onStatusChange?.(order._id, e.target.value)}
+                      className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${statusClasses[order.orderStatus] || "bg-slate-100 text-slate-700"}`}
                     >
-                      {formatStatus(order.orderStatus)}
-                    </span>
+                      {Object.keys(statusClasses).map((status) => (
+                        <option key={status} value={status}>
+                          {formatStatus(status)}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td className="py-3 text-text-muted">
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}

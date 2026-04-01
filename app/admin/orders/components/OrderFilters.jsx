@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import SearchInput from "@/components/common/SearchInput";
 
 export default function OrderFilters({
   search,
@@ -10,16 +10,13 @@ export default function OrderFilters({
 }) {
   return (
     <div className="flex flex-wrap gap-4 rounded-xl border border-border-default bg-surface-card p-4">
-      <label className="relative min-w-[220px] flex-1">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-        <input
-          type="text"
+      <div className="min-w-[220px] flex-1">
+        <SearchInput
           value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
+          onChange={onSearchChange}
           placeholder="Search orders..."
-          className="w-full rounded-lg border border-border-default py-2 pl-10 pr-4 outline-none focus:ring-2 focus:ring-brand-primary"
         />
-      </label>
+      </div>
 
       <select
         value={status}

@@ -6,11 +6,11 @@ import toast from "react-hot-toast";
 import { downloadInvoice, previewInvoice } from "@/services/order.service";
 
 const baseButtonClasses =
-  "inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-800 transition hover:-translate-y-[1px] hover:border-green-300 hover:shadow-sm disabled:translate-y-0 disabled:opacity-60";
+  "inline-flex items-center gap-2 rounded-lg border border-border-default px-4 py-2 text-sm font-medium text-text-heading transition duration-200 hover:-translate-y-[1px] hover:border-action-primary hover:shadow-sm disabled:translate-y-0 disabled:opacity-60";
 
 const variantClasses = {
-  solid: "bg-white hover:bg-green-50",
-  ghost: "border-gray-300 bg-transparent hover:bg-gray-50",
+  solid: "bg-surface-card hover:bg-surface-hover",
+  ghost: "border-border-default bg-transparent hover:bg-surface-hover",
 };
 
 export default function InvoiceDownloadButton({

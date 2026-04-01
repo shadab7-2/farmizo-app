@@ -155,3 +155,12 @@ export const deleteAdminReviewsBulk = async (reviewIds = []) => {
     throw new Error(getErrorMessage(err, "Failed to delete selected reviews"));
   }
 };
+
+export const deleteAdminUser = async (userId) => {
+  try {
+    const res = await api.delete(`/admin/users/${userId}`);
+    return extractData(res);
+  } catch (err) {
+    throw new Error(getErrorMessage(err, "Failed to delete user"));
+  }
+};

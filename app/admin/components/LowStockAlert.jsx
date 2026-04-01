@@ -21,7 +21,7 @@ export default function LowStockAlert({ products = [] }) {
           products.map((product) => (
             <div
               key={product._id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-border-default p-3"
+              className="flex items-center justify-between gap-3 rounded-xl border border-border-default p-3 bg-surface-card transition hover:shadow-md"
             >
               <div className="flex items-center gap-3">
                 <Image
@@ -36,9 +36,17 @@ export default function LowStockAlert({ products = [] }) {
                   <p className="text-xs text-text-muted">Rs. {Number(product.price || 0).toLocaleString("en-IN")}</p>
                 </div>
               </div>
-              <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
-                {product.stock} left
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+                  {product.stock} left
+                </span>
+                <a
+                  href="/admin/products"
+                  className="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold text-action-primary hover:bg-surface-hover"
+                >
+                  Edit Product
+                </a>
+              </div>
             </div>
           ))
         )}

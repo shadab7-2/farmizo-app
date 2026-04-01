@@ -23,7 +23,7 @@ const StarRow = ({ value = 0, onPick, size = 18, interactive = false }) => (
       >
         <Star
           size={size}
-          className={idx <= value ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+          className={idx <= value ? "fill-status-warning text-status-warning" : "text-border-default"}
         />
       </button>
     ))}
@@ -136,7 +136,7 @@ export default function ProductReviews({ productId, initialRating = 0, initialNu
   };
 
   return (
-    <section className="rounded-2xl border border-border-default bg-white p-6">
+    <section className="rounded-2xl border border-border-default bg-surface-card p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-2xl font-semibold text-text-heading">Customer Reviews</h3>
@@ -156,24 +156,24 @@ export default function ProductReviews({ productId, initialRating = 0, initialNu
 
           <form onSubmit={onSubmit} className="mt-4 space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Rating</label>
+              <label className="mb-2 block text-sm font-medium text-text-heading">Rating</label>
               <StarRow value={rating} onPick={setRating} interactive />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Comment</label>
+              <label className="mb-2 block text-sm font-medium text-text-heading">Comment</label>
               <textarea
                 rows={5}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share quality, delivery, and overall experience..."
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-green-500"
+                className="w-full rounded-lg border border-border-default px-3 py-2 text-sm outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary/30"
               />
             </div>
             <div className="flex flex-wrap gap-3">
               <button
                 disabled={submitting}
                 type="submit"
-                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                className="rounded-lg bg-action-primary px-4 py-2 text-sm font-semibold text-text-inverse hover:bg-action-primary-hover disabled:opacity-60 transition duration-200"
               >
                 {submitting ? "Saving..." : myReview ? "Update Review" : "Submit Review"}
               </button>
@@ -182,7 +182,7 @@ export default function ProductReviews({ productId, initialRating = 0, initialNu
                   disabled={submitting}
                   type="button"
                   onClick={onDelete}
-                  className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                  className="rounded-lg border border-status-error/40 px-4 py-2 text-sm font-semibold text-status-error hover:bg-status-error/10 disabled:opacity-60 transition duration-200"
                 >
                   Delete Review
                 </button>
@@ -196,13 +196,13 @@ export default function ProductReviews({ productId, initialRating = 0, initialNu
           {loading ? (
             <div className="mt-4 text-sm text-text-muted">Loading reviews...</div>
           ) : (data.reviews || []).length === 0 ? (
-            <div className="mt-4 rounded-lg border border-dashed border-gray-300 p-4 text-sm text-text-muted">
+            <div className="mt-4 rounded-lg border border-dashed border-border-default p-4 text-sm text-text-muted">
               No reviews yet. Be the first to review this product.
             </div>
           ) : (
             <div className="mt-4 space-y-4">
               {(data.reviews || []).map((review) => (
-                <article key={review._id} className="rounded-xl border border-gray-200 p-4">
+                <article key={review._id} className="rounded-xl border border-border-default p-4 bg-surface-card">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-semibold text-text-heading">{review.name}</p>
@@ -213,12 +213,12 @@ export default function ProductReviews({ productId, initialRating = 0, initialNu
                         </span>
                       </div>
                     </div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-status-success/10 px-2 py-1 text-xs font-medium text-status-success">
                       <BadgeCheck size={14} />
                       Verified Purchase
                     </span>
                   </div>
-                  <p className="mt-3 text-sm text-gray-700">{review.comment}</p>
+                  <p className="mt-3 text-sm text-text-body">{review.comment}</p>
                 </article>
               ))}
 
@@ -228,18 +228,18 @@ export default function ProductReviews({ productId, initialRating = 0, initialNu
                     type="button"
                     disabled={page <= 1}
                     onClick={() => loadReviews(page - 1)}
-                    className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+                    className="rounded border border-border-default px-3 py-1 text-sm disabled:opacity-50 bg-surface-card hover:bg-surface-hover transition duration-200"
                   >
                     Prev
                   </button>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-text-muted">
                     Page {page} of {data.pagination.pages}
                   </span>
                   <button
                     type="button"
                     disabled={page >= data.pagination.pages}
                     onClick={() => loadReviews(page + 1)}
-                    className="rounded border px-3 py-1 text-sm disabled:opacity-50"
+                    className="rounded border border-border-default px-3 py-1 text-sm disabled:opacity-50 bg-surface-card hover:bg-surface-hover transition duration-200"
                   >
                     Next
                   </button>

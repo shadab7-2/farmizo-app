@@ -49,7 +49,7 @@ export default function SearchResults({ query }) {
 
   if (error) {
     return (
-      <p className="text-center text-red-500">{error}</p>
+      <p className="text-center text-status-error">{error}</p>
     );
   }
 

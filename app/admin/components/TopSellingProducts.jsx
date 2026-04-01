@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "@/components/common/SafeImage";
+
 const formatMoney = (value) => `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
 
 export default function TopSellingProducts({ products = [] }) {
@@ -7,33 +9,39 @@ export default function TopSellingProducts({ products = [] }) {
     <div className="rounded-2xl border border-border-default bg-white p-6 shadow-sm">
       <h3 className="text-lg font-semibold text-text-heading">Top Selling Products</h3>
 
-      <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="border-b border-border-default text-left text-text-muted">
-            <tr>
-              <th className="pb-3 font-medium">Product</th>
-              <th className="pb-3 font-medium">Sales Count</th>
-              <th className="pb-3 font-medium">Revenue</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border-default">
-            {products.length === 0 ? (
-              <tr>
-                <td colSpan={3} className="py-6 text-center text-text-muted">
-                  No sales data available
-                </td>
-              </tr>
-            ) : (
-              products.map((product) => (
-                <tr key={product.productId || product.name}>
-                  <td className="py-3 font-medium text-text-heading">{product.name}</td>
-                  <td className="py-3">{product.salesCount}</td>
-                  <td className="py-3">{formatMoney(product.revenue)}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="mt-4 space-y-3">
+        {products.length === 0 ? (
+          <p className="text-sm text-text-muted text-center py-6">No sales data available</p>
+        ) : (
+          products.map((product) => (
+            <div
+              key={product.productId || product.name}
+              className="flex items-center justify-between gap-3 rounded-xl border border-border-default bg-surface-card p-3 transition hover:shadow-md"
+            >
+              <div className="flex items-center gap-3">
+                <Image
+                  src={product.image || "/placeholder.jpg"}
+                  alt={product.name}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-lg object-cover"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-text-heading">{product.name}</p>
+                  <p className="text-xs text-text-muted">
+                    {product.salesCount} sales • {formatMoney(product.revenue)}
+                  </p>
+                </div>
+              </div>
+              <a
+                href="/admin/products"
+                className="rounded-lg border border-border-default px-3 py-1.5 text-xs font-semibold text-action-primary hover:bg-surface-hover"
+              >
+                View / Edit
+              </a>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

@@ -103,7 +103,7 @@ export default function OrderDetailsModal({ isOpen, loading, order, onClose }) {
                     Shipping Address:{" "}
                     <span className="font-medium">
                       {order?.shippingAddress?.address || "-"}, {order?.shippingAddress?.city || "-"},{" "}
-                      {order?.shippingAddress?.postalCode || "-"}
+                      {order?.shippingAddress?.pincode || "-"}
                     </span>
                   </p>
                   <p>

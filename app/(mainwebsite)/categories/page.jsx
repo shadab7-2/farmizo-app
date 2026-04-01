@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "@/components/common/SafeImage";
 import { fetchCategories } from "@/services/category.service";
+import CategoryCard from "@/components/category/CategoryCard";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -26,60 +26,46 @@ export default function CategoriesPage() {
     load();
   }, []);
 
-  if (loading)
-    return <main className="py-32 text-center">Loading categories...</main>;
-
   if (error)
     return <main className="py-32 text-center text-red-500">{error}</main>;
 
   return (
-    <main>
-      {/* HEADER */}
-      <section className="bg-bg-section-soft">
-        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <h1 className="text-4xl font-bold text-text-heading">
-            Shop by Category
+    <main className="bg-bg-page">
+      <section className="bg-gradient-to-r from-emerald-50 via-white to-emerald-50">
+        <div className="max-w-7xl mx-auto px-6 py-16 text-center">
+          <p className="text-sm uppercase tracking-[0.2em] text-emerald-600 font-semibold">
+            Shop by category
+          </p>
+          <h1 className="mt-2 text-3xl md:text-4xl font-bold text-text-heading">
+            Curated collections for every grower
           </h1>
-
-          <p className="mt-4 text-text-muted max-w-2xl mx-auto">
-            Explore our range of plants, seeds, fertilizers and gardening essentials.
+          <p className="mt-3 max-w-2xl mx-auto text-text-muted">
+            Explore plants, seeds, tools, and essentials tailored to your garden and farm.
           </p>
         </div>
       </section>
 
-      {/* GRID */}
-      <section className="bg-bg-page">
-        <div className="max-w-7xl mx-auto px-6 py-24">
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-10">
-
-            {categories.map((cat) => (
-              <Link
-                key={cat._id}
-                href={`/categories/${cat.slug}`}
-                className="group bg-bg-page rounded-2xl overflow-hidden border border-border-default shadow-sm hover:shadow-md transition"
+      <section className="max-w-7xl mx-auto px-6 py-12 md:py-16">
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-10">
+            {Array.from({ length: 8 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="animate-pulse rounded-2xl border border-border-default bg-white p-4 shadow-sm space-y-4"
               >
-                <div className="relative h-56">
-
-                  <Image
-                    src={cat.image || "/placeholder.jpg"}
-                    alt={cat.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition"
-                  />
-
-                </div>
-
-                <div className="p-6 text-center">
-                  <h3 className="text-xl font-semibold text-text-heading">
-                    {cat.name}
-                  </h3>
-                </div>
-
-              </Link>
+                <div className="h-44 w-full rounded-xl bg-gray-200" />
+                <div className="h-4 w-3/4 rounded bg-gray-200" />
+                <div className="h-4 w-1/2 rounded bg-gray-200" />
+              </div>
             ))}
-
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-10">
+            {categories.map((cat) => (
+              <CategoryCard key={cat._id} category={cat} />
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );

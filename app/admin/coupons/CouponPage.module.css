@@ -1,0 +1,528 @@
+/* Design tokens */
+:root {
+  --bg: #f9fafb;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #16a34a;
+  --border: #e5e7eb;
+  --radius: 12px;
+  --shadow: 0 10px 35px -18px rgba(17, 24, 39, 0.35);
+  --spacing-sm: 16px;
+  --spacing-md: 20px;
+  --spacing-lg: 24px;
+  --transition: 0.2s ease;
+}
+
+.page {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 4px 0 0;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.statusPill {
+  background: #e8f7ee;
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid #b2e1c1;
+}
+
+.errorBanner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.successBanner {
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.helper {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 14px;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
+}
+
+.switchRow {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f9fafb;
+}
+
+.switchLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 999px;
+  transition: background var(--transition);
+}
+
+.slider::after {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform var(--transition);
+}
+
+.switch input:checked + .slider {
+  background: var(--primary);
+}
+
+.switch input:checked + .slider::after {
+  transform: translateX(22px);
+}
+
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.primaryButton,
+.secondaryButton,
+.iconButton {
+  border: none;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition), opacity var(--transition);
+}
+
+.primaryButton {
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #16a34a, #17c65a);
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 10px 30px -12px rgba(22, 163, 74, 0.6);
+}
+
+.primaryButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  padding: 11px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+}
+
+.secondaryButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.listGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.couponCard {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--spacing-md);
+  align-items: center;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.couponCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px -22px rgba(17, 24, 39, 0.45);
+}
+
+.couponLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.codeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #e8f7ee;
+  color: var(--primary);
+  border-radius: 999px;
+  border: 1px solid #c7edd4;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.discount {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.couponMeta {
+  display: grid;
+  gap: 8px;
+}
+
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.metaLabel {
+  color: var(--muted);
+}
+
+.metaValue {
+  font-weight: 600;
+}
+
+.couponRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.statusActive,
+.statusExpired,
+.statusDisabled {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+}
+
+.statusActive {
+  background: #e8f7ee;
+  color: var(--primary);
+  border-color: #c7edd4;
+}
+
+.statusExpired {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.statusDisabled {
+  background: #f3f4f6;
+  color: var(--muted);
+}
+
+.actionsRow {
+  display: flex;
+  gap: 10px;
+}
+
+.iconButton {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  box-shadow: 0 6px 20px -14px rgba(0, 0, 0, 0.3);
+}
+
+.iconButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px -18px rgba(17, 24, 39, 0.4);
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.danger {
+  color: #b91c1c;
+}
+
+.badgeMuted {
+  color: var(--muted);
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--muted);
+  background: #f3f4f6;
+  border-radius: var(--radius);
+  border: 1px dashed var(--border);
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.skeletonCard {
+  background: #f3f4f6;
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--spacing-md);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.skeletonLeft,
+.skeletonMid,
+.skeletonActions,
+.skeletonLine,
+.skeletonLineWide,
+.skeletonBadge,
+.skeletonCircle {
+  background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: var(--radius);
+}
+
+.skeletonLeft {
+  height: 60px;
+}
+
+.skeletonMid {
+  display: grid;
+  gap: 8px;
+}
+
+.skeletonLineWide {
+  height: 12px;
+  width: 70%;
+}
+
+.skeletonLine {
+  height: 12px;
+  width: 50%;
+}
+
+.skeletonBadgeRow {
+  display: flex;
+  gap: 8px;
+}
+
+.skeletonBadge {
+  height: 10px;
+  width: 60px;
+  border-radius: 999px;
+}
+
+.skeletonActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: transparent;
+  animation: none;
+}
+
+.skeletonCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 900px) {
+  .couponCard {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .couponRight {
+    align-items: flex-start;
+  }
+
+  .actionsRow {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--spacing-md);
+  }
+
+  .switchRow {
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    flex-direction: column;
+  }
+}

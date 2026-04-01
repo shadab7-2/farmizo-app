@@ -26,60 +26,60 @@
      🌿 BRAND COLORS
   ========================================================= */
 
-  --brand-primary: #166534;          /* deep plant green */
-  --brand-primary-hover: #14532d;
+  --brand-primary: #2f6f3e;          /* deep plant green */
+  --brand-primary-hover: #255a32;
 
-  --brand-secondary: #22c55e;        /* fresh leaf green */
-  --brand-accent: #84cc16;           /* lime accent */
+  --brand-secondary: #4ade80;        /* fresh leaf green */
+  --brand-accent: #a7f3d0;           /* soft leaf accent */
 
   /* =========================================================
      PAGE BACKGROUNDS
   ========================================================= */
 
-  --bg-page: #f8fafc;                /* page background */
-  --bg-section-soft: #f0fdf4;        /* soft green sections */
-  --bg-section-muted: #f1f5f9;
+  --bg-page: #f6f8f5;                /* page background */
+  --bg-section-soft: #eef7f0;        /* soft green sections */
+  --bg-section-muted: #f1f5f3;
 
   /* =========================================================
      SURFACES (UI CONTAINERS)
   ========================================================= */
 
   --surface-card: #ffffff;
-  --surface-sidebar: #052e16;
+  --surface-sidebar: #1b4332;
   --surface-table-header: #ecfdf5;
-  --surface-hover: #f0fdf4;
+  --surface-hover: #edf7ed;
 
   /* =========================================================
      USER ACTIONS
   ========================================================= */
 
-  --action-primary: #166534;
-  --action-primary-hover: #14532d;
+  --action-primary: #2f6f3e;
+  --action-primary-hover: #255a32;
 
-  --action-secondary: #22c55e;
-  --action-secondary-hover: #16a34a;
+  --action-secondary: #4ade80;
+  --action-secondary-hover: #22c55e;
 
   /* =========================================================
      TEXT SYSTEM
   ========================================================= */
 
-  --text-heading: #0f172a;
-  --text-body: #334155;
-  --text-muted: #64748b;
+  --text-heading: #1b2f1b;
+  --text-body: #2f3e2f;
+  --text-muted: #6b7a6b;
   --text-inverse: #ffffff;
 
   /* =========================================================
      BORDERS
   ========================================================= */
 
-  --border-default: #e2e8f0;
-  --border-strong: #cbd5f5;
+  --border-default: #dfe6dc;
+  --border-strong: #c7d2c7;
 
   /* =========================================================
      STATUS COLORS
   ========================================================= */
 
-  --status-success: #16a34a;
+  --status-success: #22c55e;
   --status-warning: #f59e0b;
   --status-error: #ef4444;
   --status-info: #3b82f6;
@@ -94,14 +94,14 @@
 
   :root {
 
-    --bg-page: #020617;
-    --bg-section-soft: #022c22;
-    --bg-section-muted: #0f172a;
+    --bg-page: #0b1a12;
+    --bg-section-soft: #0f2419;
+    --bg-section-muted: #1a2e22;
 
-    --surface-card: #0f172a;
-    --surface-sidebar: #021c12;
+    --surface-card: #132a1d;
+    --surface-sidebar: #081c15;
     --surface-table-header: #022c22;
-    --surface-hover: #052e16;
+    --surface-hover: #1b4332;
 
     --brand-primary: #22c55e;
     --brand-primary-hover: #16a34a;

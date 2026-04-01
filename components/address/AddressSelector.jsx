@@ -15,13 +15,15 @@ export default function AddressSelector({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-text-heading">Saved Addresses</h3>
-        <button
-          type="button"
-          onClick={onAddNew}
-          className="text-sm font-semibold text-action-primary hover:underline"
-        >
-          + Add New Address
-        </button>
+        {onAddNew && (
+          <button
+            type="button"
+            onClick={onAddNew}
+            className="text-sm font-semibold text-action-primary hover:underline"
+          >
+            + Add New Address
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

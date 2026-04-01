@@ -69,10 +69,10 @@ export default function OrderTimeline({ timeline = [], currentStatus }) {
                     w-10 h-10 flex items-center justify-center rounded-full border-2 transition
                     ${
                       state === "completed"
-                        ? "bg-green-500 border-green-500 text-white"
+                        ? "bg-status-success border-status-success text-text-inverse"
                         : state === "current"
-                        ? "border-blue-500 text-blue-500 animate-pulse"
-                        : "border-gray-300 text-gray-400"
+                        ? "border-action-primary text-action-primary animate-pulse"
+                        : "border-border-default text-text-muted"
                     }
                   `}
                 >
@@ -83,8 +83,8 @@ export default function OrderTimeline({ timeline = [], currentStatus }) {
                   <div
                     className={`w-[2px] h-10 ${
                       state === "completed"
-                        ? "bg-green-500"
-                        : "bg-gray-300"
+                        ? "bg-status-success"
+                        : "bg-border-default"
                     }`}
                   />
                 )}
@@ -95,21 +95,21 @@ export default function OrderTimeline({ timeline = [], currentStatus }) {
                 <p
                   className={`font-semibold ${
                     state === "current"
-                      ? "text-blue-600"
+                      ? "text-action-primary"
                       : state === "completed"
-                      ? "text-green-600"
-                      : "text-gray-500"
+                      ? "text-status-success"
+                      : "text-text-muted"
                   }`}
                 >
                   {STEP_CONFIG[step].label}
                 </p>
 
                 {record ? (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-text-muted mt-1">
                     {formatDate(record.date)}
                   </p>
                 ) : (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-text-muted mt-1">
                     Waiting...
                   </p>
                 )}

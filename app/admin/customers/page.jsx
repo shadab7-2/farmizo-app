@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Search,
-  Users,
-  ShoppingCart,
-  DollarSign,
-  Eye,
-  UserX,
-} from "lucide-react";
-import api from "@/services/api";
+import { Users, ShoppingCart, DollarSign, Eye, UserX } from "lucide-react";
+import toast from "react-hot-toast";
+import { getAdminCustomers, toggleAdminCustomerStatus, deleteAdminUser } from "@/services/admin.service";
+import useDebounce from "@/hooks/useDebounce";
+import SearchInput from "@/components/common/SearchInput";
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState([]);
@@ -17,38 +13,55 @@ export default function CustomersPage() {
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    totalItems: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const [stats, setStats] = useState({
     totalCustomers: 0,
     totalOrders: 0,
     totalRevenue: 0,
   });
+  const debouncedSearch = useDebounce(search, 500);
 
   const limit = 10;
 
   useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
     loadCustomers();
-  }, [page]);
+  }, [page, debouncedSearch]);
 
   const loadCustomers = async () => {
     try {
       setLoading(true);
 
-      const res = await api.get(
-        `/admin/customers?page=${page}&limit=${limit}&search=${search}`
-      );
-
-      setCustomers(res.data.data);
-
-      setStats({
-        totalCustomers: res.data.totalCustomers,
-        totalOrders: res.data.totalOrders,
-        totalRevenue: res.data.totalRevenue,
+      const { customers, stats, pagination } = await getAdminCustomers({
+        page,
+        limit,
+        search: debouncedSearch,
       });
+
+      setCustomers(customers);
+      setStats({
+        totalCustomers: stats.totalCustomers,
+        totalOrders: stats.totalOrders,
+        totalRevenue: stats.totalRevenue,
+      });
+      setPagination(pagination);
     } catch (err) {
       console.error("Failed to load customers");
+      toast.error(err.message || "Failed to load customers");
     } finally {
       setLoading(false);
     }
@@ -56,11 +69,23 @@ export default function CustomersPage() {
 
   const toggleUserStatus = async (id) => {
     try {
-      await api.patch(`/admin/customers/${id}/toggle`);
+      await toggleAdminCustomerStatus(id);
 
       loadCustomers();
     } catch (err) {
-      console.error("Failed to update user");
+      toast.error(err.message || "Failed to update user");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget?._id) return;
+    try {
+      await deleteAdminUser(deleteTarget._id);
+      toast.success("User deleted");
+      setDeleteTarget(null);
+      loadCustomers();
+    } catch (err) {
+      toast.error(err.message || "Failed to delete user");
     }
   };
 
@@ -105,7 +130,7 @@ export default function CustomersPage() {
           <div>
             <p className="text-sm text-gray-500">Revenue</p>
             <p className="text-xl font-semibold">
-              ₹{stats.totalRevenue}
+              Rs. {stats.totalRevenue}
             </p>
           </div>
         </div>
@@ -114,19 +139,12 @@ export default function CustomersPage() {
 
       {/* SEARCH */}
       <div className="bg-white p-4 border rounded-xl flex items-center gap-3">
-        <Search size={18} className="text-gray-400" />
-        <input
-          placeholder="Search customers..."
-          className="w-full outline-none"
+        <SearchInput
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={setSearch}
+          placeholder="Search customers..."
+          className="flex-1"
         />
-        <button
-          onClick={loadCustomers}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm"
-        >
-          Search
-        </button>
       </div>
 
       {/* TABLE */}
@@ -170,7 +188,7 @@ export default function CustomersPage() {
                   </td>
 
                   <td className="p-4">
-                    ₹{customer.totalSpent}
+                    Rs. {customer.totalSpent}
                   </td>
 
                   <td className="p-4">
@@ -193,12 +211,17 @@ export default function CustomersPage() {
 
                     {/* DISABLE USER */}
                     <button
-                      onClick={() =>
-                        toggleUserStatus(customer._id)
-                      }
+                      onClick={() => toggleUserStatus(customer._id)}
                       className="text-red-500"
                     >
                       <UserX size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteTarget(customer)}
+                      className="text-red-600 font-semibold text-xs border border-red-200 px-3 py-1 rounded-lg hover:bg-red-50 transition"
+                    >
+                      Delete
                     </button>
 
                   </td>
@@ -216,20 +239,21 @@ export default function CustomersPage() {
       <div className="flex justify-center gap-4">
 
         <button
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-          className="px-4 py-2 border rounded-lg"
+          disabled={!pagination.hasPrevPage}
+          onClick={() => setPage(Math.max(1, page - 1))}
+          className="px-4 py-2 border rounded-lg disabled:opacity-60"
         >
           Prev
         </button>
 
         <span className="px-4 py-2">
-          Page {page}
+          Page {pagination.page} of {pagination.totalPages}
         </span>
 
         <button
+          disabled={!pagination.hasNextPage}
           onClick={() => setPage(page + 1)}
-          className="px-4 py-2 border rounded-lg"
+          className="px-4 py-2 border rounded-lg disabled:opacity-60"
         >
           Next
         </button>
@@ -260,7 +284,7 @@ export default function CustomersPage() {
             </p>
 
             <p>
-              <b>Total Spent:</b> ₹
+              <b>Total Spent:</b> Rs. 
               {selectedCustomer.totalSpent}
             </p>
 
@@ -275,6 +299,32 @@ export default function CustomersPage() {
 
           </div>
 
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl w-[360px]">
+            <h2 className="text-lg font-semibold text-text-heading mb-2">Delete User?</h2>
+            <p className="text-sm text-text-muted mb-6">
+              This action will permanently remove {deleteTarget.name || "this user"}.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 rounded-lg border border-border-default text-text-heading hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 rounded-lg bg-status-error text-white hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

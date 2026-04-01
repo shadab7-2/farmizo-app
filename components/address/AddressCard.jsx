@@ -10,7 +10,7 @@ export default function AddressCard({
 }) {
   return (
     <label
-      className={`block rounded-2xl border p-4 shadow-sm cursor-pointer transition ${
+      className={`block rounded-2xl border p-4 shadow-sm bg-surface-card cursor-pointer transition duration-200 hover:shadow-md ${
         selected
           ? "border-action-primary bg-bg-section-soft"
           : "border-border-default hover:border-action-primary/50"
@@ -27,11 +27,11 @@ export default function AddressCard({
         <div className="flex-1 space-y-1">
           <div className="flex items-center gap-2">
             <p className="font-semibold text-text-heading">{address.fullName || "Saved Address"}</p>
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+            <span className="text-xs rounded bg-status-success/15 px-2 py-1 text-status-success">
               {address.label || "Home"}
             </span>
             {address.isDefault && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+              <span className="text-xs rounded bg-status-success/15 px-2 py-1 text-status-success">
                 Default
               </span>
             )}
@@ -51,7 +51,7 @@ export default function AddressCard({
             <button type="button" onClick={(e) => { e.stopPropagation(); onEdit?.(); }} className="text-text-heading hover:underline">
               Edit
             </button>
-            <button type="button" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className="text-red-600 hover:underline">
+            <button type="button" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className="text-status-error hover:underline">
               Delete
             </button>
           </div>
